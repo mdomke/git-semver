@@ -1,14 +1,22 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"log"
+	"os"
+
+	"github.com/mdomke/git-semver/version"
 )
 
+var prefix = flag.String("prefix", "", "the version prefix (default: none)")
+
 func main() {
-	v, err := GitVersion()
+	flag.Parse()
+	v, err := version.Derive()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
 	}
+	v.Prefix = *prefix
 	fmt.Println(v)
 }
