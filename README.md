@@ -69,5 +69,5 @@ v3.5.2-dev22+gbaf822dd5
 Currently `git-semver` can be installed with `go get`
 
 ```sh
-$ go get gopkg.in/mdomke/git-semver.v1
+$ go get github.com/mdomke/git-semver
 ```
