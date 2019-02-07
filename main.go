@@ -11,6 +11,7 @@ import (
 var strip = flag.String("strip", "", "prefix to strip (default: none)")
 var format = flag.String("format", "", "format string (e.g.: x.y.z-p+m)")
 var excludeHash = flag.Bool("no-hash", false, "exclude commit hash (default: false)")
+var excludeMeta = flag.Bool("no-meta", false, "exclude build metadata (default: false)")
 var excludePreRelease = flag.Bool("no-pre", false, "exclude pre-release version (default: false)")
 var excludePatch = flag.Bool("no-patch", false, "exclude pre-release version (default: false)")
 var excludeMinor = flag.Bool("no-minor", false, "exclude pre-release version (default: false)")
@@ -27,7 +28,7 @@ func selectFormat() string {
 		format = version.NoPatchFormat
 	case *excludePreRelease:
 		format = version.NoPreFormat
-	case *excludeHash:
+	case *excludeHash, *excludeMeta:
 		format = version.NoMetaFormat
 	default:
 		format = version.FullFormat
