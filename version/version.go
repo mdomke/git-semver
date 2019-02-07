@@ -8,40 +8,105 @@ import (
 	"strings"
 )
 
-// Prefix is the valid version prefix
-const Prefix string = "v"
+// Predefined format strings to be used with the Format function
+const (
+	FullFormat    = "x.y.z-p+m"
+	NoMetaFormat  = "x.y.z-p"
+	NoPreFormat   = "x.y.z"
+	NoPatchFormat = "x.y"
+	NoMinorFormat = "x"
+)
+
+type buffer []byte
+
+func (b *buffer) AppendInt(i int, sep byte) {
+	b.AppendString(strconv.FormatInt(int64(i), 10), sep)
+}
+
+func (b *buffer) AppendString(s string, sep byte) {
+	if len(s) > 0 && len(*b) > 0 {
+		*b = append(*b, sep)
+	}
+	*b = append(*b, s...)
+}
+
+func (b *buffer) AppendByte(c byte) {
+	*b = append(*b, c)
+}
 
 // Version holds the parsed components of git describe
 type Version struct {
-	Prefix     string
 	Major      int
 	Minor      int
 	Patch      int
-	PreRelease string
+	preRelease string
 	Commits    int
 	Hash       string
 }
 
-func (v Version) String() string {
-	var suffix string
-	if v.Commits != 0 {
-		if v.PreRelease == "" {
-			v.Patch++
-			suffix = fmt.Sprintf("dev%d", v.Commits)
-		} else {
-			suffix = fmt.Sprintf("%s.dev%d", nextPreRelease(v.PreRelease), v.Commits)
+// Format returns a string representation of the version including the parts
+// defined in the format string. The format can have the following components:
+// * x -> major version
+// * y -> minor version
+// * z -> patch version
+// * p -> pre-release
+// * m -> metadata
+// x, y and z are separated by a dot. p is seprated by a hyphen and m by a plus sing.
+// E.g.: x.y.z-p+m or x.y
+func (v Version) Format(format string) (string, error) {
+	re := regexp.MustCompile(
+		`(?P<major>x)(?P<minor>\.y)?(?P<patch>\.z)?(?P<pre>-p)?(?P<meta>\+m)?`)
+
+	matches := re.FindStringSubmatch(format)
+	if matches == nil {
+		return "", fmt.Errorf("invalid format: %s", format)
+	}
+
+	var buf buffer
+	names := re.SubexpNames()
+	for i := 0; i < len(matches); i++ {
+		if len(matches[i]) == 0 {
+			continue
 		}
-	} else {
-		suffix = v.PreRelease
+		switch names[i] {
+		case "major":
+			buf.AppendInt(v.Major, '.')
+		case "minor":
+			buf.AppendInt(v.Minor, '.')
+		case "patch":
+			patch := v.Patch
+			if v.Commits > 0 && v.preRelease == "" {
+				patch++
+			}
+			buf.AppendInt(patch, '.')
+		case "pre":
+			buf.AppendString(v.PreRelease(), '-')
+		case "meta":
+			buf.AppendString(v.Hash, '+')
+		}
 	}
-	if v.Hash != "" {
-		suffix += "+" + v.Hash
+	return string(buf), nil
+}
+
+func (v Version) String() string {
+	result, err := v.Format(FullFormat)
+	if err != nil {
+		return ""
 	}
-	version := fmt.Sprintf("%s%d.%d.%d", v.Prefix, v.Major, v.Minor, v.Patch)
-	if suffix != "" {
-		version += "-" + suffix
+	return result
+}
+
+// PreRelease formats the pre-release version depending on the number n of commits since the
+// last tag. If n is zero it returns the parsed pre-release version. If n is greater than zero
+// it will append the string "dev<n>" to the pre-release version.
+func (v Version) PreRelease() string {
+	if v.Commits == 0 {
+		return v.preRelease
 	}
-	return version
+	if v.preRelease == "" {
+		return fmt.Sprintf("dev%d", v.Commits)
+	}
+	return fmt.Sprintf("%s.dev%d", nextPreRelease(v.preRelease), v.Commits)
 }
 
 func nextPreRelease(r string) string {
@@ -102,11 +167,12 @@ func parseVersion(s string, v *Version) error {
 	return nil
 }
 
-func parse(s string, v *Version) (err error) {
+func parse(s string, v *Version, strip ...string) error {
 	var version string
-	if strings.HasPrefix(s, Prefix) {
-		v.Prefix = Prefix
-		s = strings.TrimPrefix(s, Prefix)
+	for _, prefix := range strip {
+		if strings.HasPrefix(s, prefix) {
+			s = strings.TrimPrefix(s, prefix)
+		}
 	}
 	if strings.Contains(s, "-") {
 		parts := strings.Split(s, "-")
@@ -114,30 +180,30 @@ func parse(s string, v *Version) (err error) {
 		var commits string
 		switch len(parts) {
 		case 2:
-			v.PreRelease = parts[1]
+			v.preRelease = parts[1]
 		case 3:
 			commits = parts[1]
 			v.Hash = parts[2]
 		case 4:
-			v.PreRelease = parts[1]
+			v.preRelease = parts[1]
 			commits = parts[2]
 			v.Hash = parts[3]
 		default:
-			return fmt.Errorf("Invalid git version must be of format X.Y.Z(-<pre>)?(-n-<hash>)?: Got %s", s)
+			return fmt.Errorf("invalid git version must be of format X.Y.Z(-<pre>)?(-n-<hash>)?: Got %s", s)
 		}
 
 		version = parts[0]
 		if commits != "" {
+			var err error
 			v.Commits, err = strconv.Atoi(commits)
 			if err != nil {
-				return fmt.Errorf("Failed to parse commit count from %s: %v", s, err)
+				return fmt.Errorf("failed to parse commit count from %s: %v", s, err)
 			}
 		}
 	} else {
 		version = s
 	}
-	err = parseVersion(version, v)
-	return err
+	return parseVersion(version, v)
 }
 
 // Derive calculates a semantic version from the output of git describe.
@@ -149,9 +215,9 @@ func parse(s string, v *Version) (err error) {
 // If the last tag has itself a pre-release-suffix of the form (alpha|beta|rc)\d+ and the
 // last commit is not tagged, Derive will increment the version of the pre-release
 // instead of the patch-level version.
-func Derive() (Version, error) {
+func Derive(strip ...string) (Version, error) {
 	v := Version{}
 	s := gitDescribe()
-	err := parse(s, &v)
+	err := parse(s, &v, strip...)
 	return v, err
 }
