@@ -1,3 +1,5 @@
+![Travis](https://img.shields.io/travis/mdomke/git-semver.svg?style=flat-square)
+
 # Semantic Versioning with git tags
 
 Software should be versioned in order to be able to identify a certain
