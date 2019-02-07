@@ -2,7 +2,6 @@ package version
 
 import (
 	"fmt"
-	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -28,10 +27,6 @@ func (b *buffer) AppendString(s string, sep byte) {
 		*b = append(*b, sep)
 	}
 	*b = append(*b, s...)
-}
-
-func (b *buffer) AppendByte(c byte) {
-	*b = append(*b, c)
 }
 
 // Version holds the parsed components of git describe
@@ -128,24 +123,6 @@ func nextPreRelease(r string) string {
 	return fmt.Sprintf("%s%d", prefix, n)
 }
 
-func gitDescribe() string {
-	cmd := exec.Command("git", "describe", "--tags")
-	out, err := cmd.Output()
-	if err != nil {
-		return fmt.Sprintf("0.0.0-%s-", gitCommitCount())
-	}
-	return strings.TrimSpace(string(out))
-}
-
-func gitCommitCount() string {
-	cmd := exec.Command("git", "rev-list", "--count", "HEAD")
-	out, err := cmd.Output()
-	if err != nil {
-		return "0"
-	}
-	return strings.TrimSpace(string(out))
-}
-
 func parseVersion(s string, v *Version) error {
 	parts := strings.Split(s, ".")
 	if len(parts) != 3 {
@@ -217,7 +194,7 @@ func parse(s string, v *Version, strip ...string) error {
 // instead of the patch-level version.
 func Derive(strip ...string) (Version, error) {
 	v := Version{}
-	s := gitDescribe()
+	s := git.Describe()
 	err := parse(s, &v, strip...)
 	return v, err
 }
