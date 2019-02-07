@@ -1,4 +1,8 @@
-![Travis](https://img.shields.io/travis/mdomke/git-semver.svg?style=flat-square)
+[![Travis](https://img.shields.io/travis/mdomke/git-semver.svg?style=flat-square)](https://travis-ci.org/mdomke/git-semver)
+[![Docker](https://img.shields.io/docker/build/mdomke/git-semver.svg?style=flat-square)](https://hub.docker.com/r/mdomke/git-semver)
+![License](https://img.shields.io/github/license/mdomke/git-semver.svg?style=flat-square)
+![Tag](https://img.shields.io/github/tag/mdomke/git-semver.svg?style=flat-square)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mdomke/git-semver?style-flat-square)](https://goreportcard.com/report/github.com/mdomke/git-semver)
 
 # Semantic Versioning with git tags
 
