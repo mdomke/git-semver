@@ -1,3 +1,10 @@
+[![Travis](https://img.shields.io/travis/mdomke/git-semver.svg?style=flat-square)](https://travis-ci.org/mdomke/git-semver)
+[![Codecov](https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg)](https://codecov.io/gh/mdomke/git-semver)
+[![Docker](https://img.shields.io/docker/build/mdomke/git-semver.svg?style=flat-square)](https://hub.docker.com/r/mdomke/git-semver)
+![License](https://img.shields.io/github/license/mdomke/git-semver.svg?style=flat-square)
+![Tag](https://img.shields.io/github/tag/mdomke/git-semver.svg?style=flat-square)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mdomke/git-semver?style-flat-square)](https://goreportcard.com/report/github.com/mdomke/git-semver)
+
 # Semantic Versioning with git tags
 
 Software should be versioned in order to be able to identify a certain
@@ -57,11 +64,50 @@ component will be incremented in case of a pre-release-version. If the last tag 
 contains a pre-release-identifier of the form `(alpha|beta|rc)\d+`, that identifier will
 be incremnted instead of the patch-level.
 
-If you want to add a prefix to the derived version, you can use the `-prefix`-flag like so
+### Formatting
+
+The output of `git-semver` can be controlled with the `-format` option or one of it shorthand
+companions as described [here](#command-line-options). The format string can include the following
+characters
+
+| Format char | Description         |
+| ---         | ---                 |
+| `x`         | Major version       |
+| `y`         | Minor version       |
+| `z`         | Patch version       |
+| `p`         | Pre-release version |
+| `m`         | Metadata            |
+
+The format chars `x`, `y` and `z` are separted with a dot, `p` with a hyphen and `m` with a
+plus character. A valid format string is e.g.: `x.y+m`
+
+### Command line options
+
+The output and parsing of `git-semver` can be controlled with the following options.
+
+| Name                  | Description                                              |
+| ---                   | ---                                                      |
+| `-format`             | Format string as described [here](#formatting)           |
+| `-no-minor`           | Exclude minor version and all following components       |
+| `-no-patch`           | Exclude patch version and all following components       |
+| `-no-pre`             | Exclude pre-release version and all following components |
+| `-no-meta`/`-no-hash` | Exclude build metadata                                   |
+| `-strip`              | Strip characters from tag before parsing                 |
+
+
+#### Examples
 
 ```sh
-$ git-semver -prefix v
-v3.5.2-dev22+gbaf822dd5
+$ git-semver
+3.5.2-dev22+gbaf822dd5
+
+# Exclude build metadata
+$ git-semver -no-meta
+3.5.2-dev22
+
+# Only major and minor version
+$ git-semver -no-patch
+3.5
 ```
 
 ## Installation
@@ -70,4 +116,12 @@ Currently `git-semver` can be installed with `go get`
 
 ```sh
 $ go get github.com/mdomke/git-semver
+```
+
+## Docker usage
+
+You can also use `git-semver` as a docker-container. E.g.
+
+```sh
+docker run --rm -v `pwd`:/git-semver mdomke/git-semver
 ```
