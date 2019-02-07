@@ -71,3 +71,11 @@ Currently `git-semver` can be installed with `go get`
 ```sh
 $ go get github.com/mdomke/git-semver
 ```
+
+## Docker usage
+
+You can also use `git-semver` as a docker-container. E.g.
+
+```sh
+docker run --rm -v `pwd`:/git-semver mdomke/git-semver
+```
