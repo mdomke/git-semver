@@ -48,7 +48,7 @@ type Version struct {
 // * m -> metadata
 // x, y and z are separated by a dot. p is seprated by a hyphen and m by a plus sing.
 // E.g.: x.y.z-p+m or x.y
-func (v Version) Format(format string) (string, error) {
+func (v Version) Format(format string, prefix string) (string, error) {
 	re := regexp.MustCompile(
 		`(?P<major>x)(?P<minor>\.y)?(?P<patch>\.z)?(?P<pre>-p)?(?P<meta>\+m)?`)
 
@@ -58,6 +58,7 @@ func (v Version) Format(format string) (string, error) {
 	}
 
 	var buf buffer
+
 	names := re.SubexpNames()
 	for i := 0; i < len(matches); i++ {
 		if len(matches[i]) == 0 {
@@ -80,11 +81,11 @@ func (v Version) Format(format string) (string, error) {
 			buf.AppendString(v.Hash, '+')
 		}
 	}
-	return string(buf), nil
+	return prefix + string(buf), nil
 }
 
 func (v Version) String() string {
-	result, err := v.Format(FullFormat)
+	result, err := v.Format(FullFormat, "")
 	if err != nil {
 		return ""
 	}
@@ -144,12 +145,10 @@ func parseVersion(s string, v *Version) error {
 	return nil
 }
 
-func parse(s string, v *Version, strip ...string) error {
+func parse(s string, v *Version, prefix ...string) error {
 	var version string
-	for _, prefix := range strip {
-		if strings.HasPrefix(s, prefix) {
-			s = strings.TrimPrefix(s, prefix)
-		}
+	for _, p := range prefix {
+		s = strings.TrimPrefix(s, p)
 	}
 	if strings.Contains(s, "-") {
 		parts := strings.Split(s, "-")
@@ -192,9 +191,11 @@ func parse(s string, v *Version, strip ...string) error {
 // If the last tag has itself a pre-release-suffix of the form (alpha|beta|rc)\d+ and the
 // last commit is not tagged, Derive will increment the version of the pre-release
 // instead of the patch-level version.
-func Derive(strip ...string) (Version, error) {
+// Specify prefix in case the git-tag has a non SemVer commpliant prefix which should be
+// stripped by the parser.
+func Derive(prefix ...string) (Version, error) {
 	v := Version{}
 	s := git.Describe()
-	err := parse(s, &v, strip...)
+	err := parse(s, &v, prefix...)
 	return v, err
 }

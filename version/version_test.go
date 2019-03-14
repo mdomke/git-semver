@@ -118,34 +118,41 @@ func TestFormat(t *testing.T) {
 	v := Version{Major: 1, Minor: 2, Patch: 3, Commits: 10, Hash: "fcf2c8f"}
 	for _, test := range []struct {
 		f string
+		p string
 		s string
 	}{
 		{
 			FullFormat,
+			"",
 			"1.2.4-dev10+fcf2c8f",
 		},
 		{
 			NoMetaFormat,
+			"",
 			"1.2.4-dev10",
 		},
 		{
 			NoPreFormat,
+			"",
 			"1.2.4",
 		},
 		{
 			NoPatchFormat,
+			"",
 			"1.2",
 		},
 		{
 			NoMinorFormat,
-			"1",
+			"v",
+			"v1",
 		},
 		{
 			"x.y-p",
-			"1.2-dev10",
+			"v",
+			"v1.2-dev10",
 		},
 	} {
-		s, err := v.Format(test.f)
+		s, err := v.Format(test.f, test.p)
 		assert.NoError(err)
 		assert.Equal(test.s, s)
 	}
@@ -153,7 +160,7 @@ func TestFormat(t *testing.T) {
 
 func TestInvalidFormat(t *testing.T) {
 	v := Version{Major: 1, Minor: 2, Patch: 3}
-	s, err := v.Format("q")
+	s, err := v.Format("q", "")
 	assert.EqualError(t, err, "invalid format: q")
 	assert.Equal(t, "", s)
 }

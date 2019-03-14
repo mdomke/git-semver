@@ -8,7 +8,7 @@ import (
 	"github.com/mdomke/git-semver/version"
 )
 
-var strip = flag.String("strip", "", "prefix to strip (default: none)")
+var prefix = flag.String("prefix", "", "prefix of version string e.g. v (default: none)")
 var format = flag.String("format", "", "format string (e.g.: x.y.z-p+m)")
 var excludeHash = flag.Bool("no-hash", false, "exclude commit hash (default: false)")
 var excludeMeta = flag.Bool("no-meta", false, "exclude build metadata (default: false)")
@@ -38,12 +38,12 @@ func selectFormat() string {
 
 func main() {
 	flag.Parse()
-	v, err := version.Derive(*strip)
+	v, err := version.Derive(*prefix)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	s, err := v.Format(selectFormat())
+	s, err := v.Format(selectFormat(), *prefix)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
