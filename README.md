@@ -92,7 +92,8 @@ The output and parsing of `git-semver` can be controlled with the following opti
 | `-no-patch`           | Exclude patch version and all following components       |
 | `-no-pre`             | Exclude pre-release version and all following components |
 | `-no-meta`/`-no-hash` | Exclude build metadata                                   |
-| `-prefix`             | Prefix string for version e.g.: v                            |
+| `-prefix`             | Prefix string for version e.g.: v                        |
+| `-set-meta`           | Set buildmeta to this value                              |
 
 
 #### Examples
@@ -111,6 +112,9 @@ $ git-semver -no-patch
 
 $ git-semver -prefix v -no-hash
 v3.5.2
+
+$ git-semver -set-meta custom
+3.5.2+custom
 ```
 
 ## Installation
