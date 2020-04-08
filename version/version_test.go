@@ -66,6 +66,11 @@ func TestParse(t *testing.T) {
 			Version{Major: 3, Minor: 2, Patch: 1},
 			"v",
 		},
+		{
+			"3.2.1-liftoff.alpha1-3-fcf2c8f",
+			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "liftoff.alpha1", Commits: 3, Hash: "fcf2c8f"},
+			"",
+		},
 	} {
 		v := Version{}
 		err := parse(test.s, &v, test.strip)
@@ -171,6 +176,7 @@ func TestNextPreRelease(t *testing.T) {
 	assert.Equal("alpha1", nextPreRelease("alpha0"))
 	assert.Equal("beta10", nextPreRelease("beta9"))
 	assert.Equal("foo", nextPreRelease("foo"))
+	assert.Equal("foo.rc2", nextPreRelease("foo.rc1"))
 }
 
 type gitFaker struct {
@@ -191,6 +197,7 @@ func TestDerive(t *testing.T) {
 		},
 	} {
 		git = gitFaker{test.s}
-		Derive()
+		_, err := Derive()
+		assert.NoError(t, err)
 	}
 }

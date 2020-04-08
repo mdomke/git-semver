@@ -106,7 +106,7 @@ func (v Version) PreRelease() string {
 }
 
 func nextPreRelease(r string) string {
-	re, err := regexp.Compile(`(alpha|beta|rc)(\d+)`)
+	re, err := regexp.Compile(`(.*?)(alpha|beta|rc)(\d+)`)
 	if err != nil {
 		return r
 	}
@@ -115,13 +115,14 @@ func nextPreRelease(r string) string {
 		return r
 	}
 	prefix := match[1]
+	preRelease := match[2]
 	var n int
-	n, err = strconv.Atoi(match[2])
+	n, err = strconv.Atoi(match[3])
 	if err != nil {
 		return r
 	}
 	n++
-	return fmt.Sprintf("%s%d", prefix, n)
+	return fmt.Sprintf("%s%s%d", prefix, preRelease, n)
 }
 
 func parseVersion(s string, v *Version) error {
