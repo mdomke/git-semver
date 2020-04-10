@@ -38,7 +38,7 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			"1.2.3-4-fcf2c8f",
-			Version{Major: 1, Minor: 2, Patch: 3, Commits: 4, Hash: "fcf2c8f"},
+			Version{Major: 1, Minor: 2, Patch: 3, Commits: 4, Meta: "fcf2c8f"},
 			"",
 		},
 		{
@@ -53,7 +53,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			"1.2.3-rc1-2-gd92f0b2",
-			Version{Major: 1, Minor: 2, Patch: 3, preRelease: "rc1", Commits: 2, Hash: "gd92f0b2"},
+			Version{Major: 1, Minor: 2, Patch: 3, preRelease: "rc1", Commits: 2, Meta: "gd92f0b2"},
 			"",
 		},
 		{
@@ -68,7 +68,22 @@ func TestParse(t *testing.T) {
 		},
 		{
 			"3.2.1-liftoff.alpha1-3-fcf2c8f",
-			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "liftoff.alpha1", Commits: 3, Hash: "fcf2c8f"},
+			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "liftoff.alpha1", Commits: 3, Meta: "fcf2c8f"},
+			"",
+		},
+		{
+			"3.2.1+special",
+			Version{Major: 3, Minor: 2, Patch: 1, Meta: "special"},
+			"",
+		},
+		{
+			"3.2.1-rc2+special",
+			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc2", Meta: "special"},
+			"",
+		},
+		{
+			"3.2.1-rc2+special-3-gd92f0b2",
+			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc2", Commits: 3, Meta: "special"},
 			"",
 		},
 	} {
@@ -97,7 +112,7 @@ func TestString(t *testing.T) {
 		s string
 	}{
 		{
-			Version{Major: 1, Minor: 2, Patch: 3, Commits: 10, Hash: "fcf2c8f"},
+			Version{Major: 1, Minor: 2, Patch: 3, Commits: 10, Meta: "fcf2c8f"},
 			"1.2.4-dev10+fcf2c8f",
 		},
 		{
@@ -120,7 +135,7 @@ func TestString(t *testing.T) {
 
 func TestFormat(t *testing.T) {
 	assert := assert.New(t)
-	v := Version{Major: 1, Minor: 2, Patch: 3, Commits: 10, Hash: "fcf2c8f"}
+	v := Version{Major: 1, Minor: 2, Patch: 3, Commits: 10, Meta: "fcf2c8f"}
 	for _, test := range []struct {
 		f string
 		p string
@@ -193,7 +208,7 @@ func TestDerive(t *testing.T) {
 	}{
 		{
 			"3.2.1-rc3-10-ge6c3c44",
-			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc3", Commits: 10, Hash: "ge6c3c44"},
+			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc3", Commits: 10, Meta: "ge6c3c44"},
 		},
 	} {
 		git = gitFaker{test.s}

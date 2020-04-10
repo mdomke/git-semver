@@ -45,7 +45,7 @@ func main() {
 		os.Exit(1)
 	}
 	if *setMeta != "" {
-		v.Hash = *setMeta
+		v.Meta = *setMeta
 	}
 	s, err := v.Format(selectFormat(), *prefix)
 	if err != nil {

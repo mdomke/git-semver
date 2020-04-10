@@ -36,7 +36,7 @@ type Version struct {
 	Patch      int
 	preRelease string
 	Commits    int
-	Hash       string
+	Meta       string
 }
 
 // Format returns a string representation of the version including the parts
@@ -78,7 +78,7 @@ func (v Version) Format(format string, prefix string) (string, error) {
 		case "pre":
 			buf.AppendString(v.PreRelease(), '-')
 		case "meta":
-			buf.AppendString(v.Hash, '+')
+			buf.AppendString(v.Meta, '+')
 		}
 	}
 	return prefix + string(buf), nil
@@ -147,29 +147,31 @@ func parseVersion(s string, v *Version) error {
 }
 
 func parse(s string, v *Version, prefix ...string) error {
-	var version string
 	for _, p := range prefix {
 		s = strings.TrimPrefix(s, p)
 	}
+	var version string
 	if strings.Contains(s, "-") {
 		parts := strings.Split(s, "-")
 
 		var commits string
+		version, v.Meta = splitMeta(parts[0])
 		switch len(parts) {
 		case 2:
-			v.preRelease = parts[1]
+			v.preRelease, v.Meta = splitMeta(parts[1])
 		case 3:
 			commits = parts[1]
-			v.Hash = parts[2]
+			v.Meta = parts[2]
 		case 4:
-			v.preRelease = parts[1]
+			v.preRelease, v.Meta = splitMeta(parts[1])
 			commits = parts[2]
-			v.Hash = parts[3]
+			if v.Meta == "" {
+				v.Meta = parts[3]
+			}
 		default:
-			return fmt.Errorf("invalid git version must be of format X.Y.Z(-<pre>)?(-n-<hash>)?: Got %s", s)
+			return fmt.Errorf("invalid git version must be of format X.Y.Z(+meta)?(-<pre>)?(-n-<hash>)?: Got %s", s)
 		}
 
-		version = parts[0]
 		if commits != "" {
 			var err error
 			v.Commits, err = strconv.Atoi(commits)
@@ -178,9 +180,22 @@ func parse(s string, v *Version, prefix ...string) error {
 			}
 		}
 	} else {
-		version = s
+		version, v.Meta = splitMeta(s)
 	}
 	return parseVersion(version, v)
+}
+
+func splitMeta(s string) (string, string) {
+	meta := ""
+	if !strings.Contains(s, "+") {
+		return s, meta
+	}
+	parts := strings.Split(s, "+")
+	if len(parts) >= 2 {
+		s = parts[0]
+		meta = strings.Join(parts[1:], "")
+	}
+	return s, meta
 }
 
 // Derive calculates a semantic version from the output of git describe.
