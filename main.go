@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mdomke/git-semver/version"
+	"github.com/mdomke/git-semver/v4/version"
 )
 
 var prefix = flag.String("prefix", "", "prefix of version string e.g. v (default: none)")

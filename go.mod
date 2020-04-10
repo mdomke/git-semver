@@ -1,4 +1,4 @@
-module github.com/mdomke/git-semver
+module github.com/mdomke/git-semver/v4
 
 go 1.14
 
