@@ -15,6 +15,6 @@ func TestGitDescribe(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
-	os.Chdir(dir)
+	_ = os.Chdir(dir)
 	assert.Equal("0.0.0-0-", git.Describe())
 }
