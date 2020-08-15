@@ -113,7 +113,7 @@ func TestString(t *testing.T) {
 	}{
 		{
 			Version{Major: 1, Minor: 2, Patch: 3, Commits: 10, Meta: "fcf2c8f"},
-			"1.2.4-dev10+fcf2c8f",
+			"1.2.4-dev.10+fcf2c8f",
 		},
 		{
 			Version{Major: 0, Minor: 3, Patch: 1},
@@ -125,7 +125,7 @@ func TestString(t *testing.T) {
 		},
 		{
 			Version{Major: 2, Minor: 5, Patch: 0, preRelease: "rc3", Commits: 3},
-			"2.5.0-rc4.dev3",
+			"2.5.0-rc4.dev.3",
 		},
 	} {
 		assert.Equal(test.s, test.v.String())
@@ -144,12 +144,12 @@ func TestFormat(t *testing.T) {
 		{
 			FullFormat,
 			"",
-			"1.2.4-dev10+fcf2c8f",
+			"1.2.4-dev.10+fcf2c8f",
 		},
 		{
 			NoMetaFormat,
 			"",
-			"1.2.4-dev10",
+			"1.2.4-dev.10",
 		},
 		{
 			NoPreFormat,
@@ -169,7 +169,7 @@ func TestFormat(t *testing.T) {
 		{
 			"x.y-p",
 			"v",
-			"v1.2-dev10",
+			"v1.2-dev.10",
 		},
 	} {
 		s, err := v.Format(test.f, test.p)
