@@ -94,15 +94,15 @@ func (v Version) String() string {
 
 // PreRelease formats the pre-release version depending on the number n of commits since the
 // last tag. If n is zero it returns the parsed pre-release version. If n is greater than zero
-// it will append the string "dev<n>" to the pre-release version.
+// it will append the string "dev.<n>" to the pre-release version.
 func (v Version) PreRelease() string {
 	if v.Commits == 0 {
 		return v.preRelease
 	}
 	if v.preRelease == "" {
-		return fmt.Sprintf("dev%d", v.Commits)
+		return fmt.Sprintf("dev.%d", v.Commits)
 	}
-	return fmt.Sprintf("%s.dev%d", nextPreRelease(v.preRelease), v.Commits)
+	return fmt.Sprintf("%s.dev.%d", nextPreRelease(v.preRelease), v.Commits)
 }
 
 func nextPreRelease(r string) string {
@@ -200,7 +200,7 @@ func splitMeta(s string) (string, string) {
 
 // Derive calculates a semantic version from the output of git describe.
 // If the latest commit is not tagged, the version will have a pre-release-suffix
-// appended to it (e.g.: 1.2.3-dev3+fcf2c8f). The suffix has the format dev<n>+<hash>,
+// appended to it (e.g.: 1.2.3-dev.3+fcf2c8f). The suffix has the format dev.<n>+<hash>,
 // whereas n is the number of commits since the last tag and hash is the commit hash
 // of the latest commit. Derive will also increment the patch-level version component
 // in case it detects that the current version is a pre-release.

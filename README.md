@@ -54,11 +54,11 @@ Sadly this identifier has two drawbacks.
 version from it. E.g.:
 
 ```
-3.5.1-22-gbaf822dd5 -> 3.5.2-dev22+gbaf822dd5
-4.2.0-rc3-5-fcf2c8f -> 4.2.0-rc4.dev5-fcf2c8f
+3.5.1-22-gbaf822dd5 -> 3.5.2-dev.22+gbaf822dd5
+4.2.0-rc3-5-fcf2c8f -> 4.2.0-rc4.dev.5-fcf2c8f
 ```
 
-It will attach a pre-release tag of the form `devN`, where `N` is the number of commits
+It will attach a pre-release tag of the form `dev.N`, where `N` is the number of commits
 since the last commit, and the commit hash as build-metadata. Additionally the patch level
 component will be incremented in case of a pre-release-version. If the last tag itself
 contains a pre-release-identifier of the form `(alpha|beta|rc)\d+`, that identifier will
@@ -100,11 +100,11 @@ The output and parsing of `git-semver` can be controlled with the following opti
 
 ```sh
 $ git-semver
-3.5.2-dev22+gbaf822dd5
+3.5.2-dev.22+gbaf822dd5
 
 # Exclude build metadata
 $ git-semver -no-meta
-3.5.2-dev22
+3.5.2-dev.22
 
 # Only major and minor version
 $ git-semver -no-patch
