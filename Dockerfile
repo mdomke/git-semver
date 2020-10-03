@@ -1,9 +1,9 @@
 FROM golang:1.14-alpine3.12 as builder
 COPY . /go/src/github.com/mdomke/git-semver
-RUN go install github.com/mdomke/git-semver
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install github.com/mdomke/git-semver
 
-FROM docker:18-git
+FROM alpine:3.12
+RUN apk add --update --no-cache git
 COPY --from=builder /go/bin/git-semver /usr/local/bin/
-RUN mkdir /git-semver
 WORKDIR /git-semver
 ENTRYPOINT ["git-semver"]
