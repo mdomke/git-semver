@@ -39,7 +39,7 @@ func selectFormat() string {
 
 func main() {
 	flag.Parse()
-	v, err := version.Derive(*prefix)
+	v, err := version.Derive()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -47,7 +47,10 @@ func main() {
 	if *setMeta != "" {
 		v.Meta = *setMeta
 	}
-	s, err := v.Format(selectFormat(), *prefix)
+	if *prefix != "" {
+		v.Prefix = *prefix
+	}
+	s, err := v.Format(selectFormat())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

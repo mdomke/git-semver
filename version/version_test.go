@@ -32,63 +32,52 @@ func TestParse(t *testing.T) {
 	assert := assert.New(t)
 
 	for _, test := range []struct {
-		s     string
-		v     Version
-		strip string
+		s string
+		v Version
 	}{
 		{
 			"1.2.3-4-fcf2c8f",
 			Version{Major: 1, Minor: 2, Patch: 3, Commits: 4, Meta: "fcf2c8f"},
-			"",
 		},
 		{
 			"0.0.0-0-",
 			Version{},
-			"",
 		},
 		{
 			"1.2.3-rc.1",
 			Version{Major: 1, Minor: 2, Patch: 3, preRelease: "rc.1"},
-			"",
 		},
 		{
 			"1.2.3-rc.1-2-gd92f0b2",
 			Version{Major: 1, Minor: 2, Patch: 3, preRelease: "rc.1", Commits: 2, Meta: "gd92f0b2"},
-			"",
 		},
 		{
 			"3.2.1",
 			Version{Major: 3, Minor: 2, Patch: 1},
-			"",
 		},
 		{
 			"v3.2.1",
-			Version{Major: 3, Minor: 2, Patch: 1},
-			"v",
+			Version{Prefix: "v", Major: 3, Minor: 2, Patch: 1},
 		},
 		{
 			"3.2.1-liftoff.alpha.1-3-fcf2c8f",
 			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "liftoff.alpha.1", Commits: 3, Meta: "fcf2c8f"},
-			"",
 		},
 		{
 			"3.2.1+special",
 			Version{Major: 3, Minor: 2, Patch: 1, Meta: "special"},
-			"",
 		},
 		{
 			"3.2.1-rc.2+special",
 			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc.2", Meta: "special"},
-			"",
 		},
 		{
 			"3.2.1-rc.2+special-3-gd92f0b2",
 			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc.2", Commits: 3, Meta: "special"},
-			"",
 		},
 	} {
 		v := Version{}
-		err := parse(test.s, &v, test.strip)
+		err := parse(test.s, &v)
 		assert.NoError(err)
 		assert.Equal(test.v, v)
 	}
@@ -172,7 +161,8 @@ func TestFormat(t *testing.T) {
 			"v1.2-dev.10",
 		},
 	} {
-		s, err := v.Format(test.f, test.p)
+		v.Prefix = test.p
+		s, err := v.Format(test.f)
 		assert.NoError(err)
 		assert.Equal(test.s, s)
 	}
@@ -180,7 +170,7 @@ func TestFormat(t *testing.T) {
 
 func TestInvalidFormat(t *testing.T) {
 	v := Version{Major: 1, Minor: 2, Patch: 3}
-	s, err := v.Format("q", "")
+	s, err := v.Format("q")
 	assert.EqualError(t, err, "invalid format: q")
 	assert.Equal(t, "", s)
 }

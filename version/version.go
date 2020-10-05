@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// DefaultPrefix that is recognized and ignored by the parser
+const DefaultPrefix = "v"
+
 // Predefined format strings to be used with the Format function
 const (
 	FullFormat    = "x.y.z-p+m"
@@ -31,6 +34,7 @@ func (b *buffer) AppendString(s string, sep byte) {
 
 // Version holds the parsed components of git describe
 type Version struct {
+	Prefix     string
 	Major      int
 	Minor      int
 	Patch      int
@@ -48,7 +52,7 @@ type Version struct {
 // * m -> metadata
 // x, y and z are separated by a dot. p is seprated by a hyphen and m by a plus sing.
 // E.g.: x.y.z-p+m or x.y
-func (v Version) Format(format string, prefix string) (string, error) {
+func (v Version) Format(format string) (string, error) {
 	re := regexp.MustCompile(
 		`(?P<major>x)(?P<minor>\.y)?(?P<patch>\.z)?(?P<pre>-p)?(?P<meta>\+m)?`)
 
@@ -81,11 +85,11 @@ func (v Version) Format(format string, prefix string) (string, error) {
 			buf.AppendString(v.Meta, '+')
 		}
 	}
-	return prefix + string(buf), nil
+	return v.Prefix + string(buf), nil
 }
 
 func (v Version) String() string {
-	result, err := v.Format(FullFormat, "")
+	result, err := v.Format(FullFormat)
 	if err != nil {
 		return ""
 	}
@@ -126,10 +130,11 @@ func parseVersion(s string, v *Version) error {
 	return nil
 }
 
-func parse(s string, v *Version, prefix ...string) error {
-	for _, p := range prefix {
-		s = strings.TrimPrefix(s, p)
+func parse(s string, v *Version) error {
+	if strings.HasPrefix(s, DefaultPrefix) {
+		v.Prefix = DefaultPrefix
 	}
+	s = strings.TrimPrefix(s, v.Prefix)
 	var version string
 	if strings.Contains(s, "-") {
 		parts := strings.Split(s, "-")
@@ -184,14 +189,15 @@ func splitMeta(s string) (string, string) {
 // whereas n is the number of commits since the last tag and hash is the commit hash
 // of the latest commit. Derive will also increment the patch-level version component
 // in case it detects that the current version is a pre-release.
-// If the last tag has itself a pre-release-suffix of the form (alpha|beta|rc)\d+ and the
-// last commit is not tagged, Derive will increment the version of the pre-release
-// instead of the patch-level version.
-// Specify prefix in case the git-tag has a non SemVer commpliant prefix which should be
-// stripped by the parser.
+// If the last tag has itself a pre-releas-identifier and the last commit is not tagged,
+// Derive will not increment the patch-level version.
+// The not SemVer commpliant but commonly used prefix v will be automatically detected.
 func Derive(prefix ...string) (Version, error) {
 	v := Version{}
+	if len(prefix) == 1 {
+		v.Prefix = prefix[0]
+	}
 	s := git.Describe()
-	err := parse(s, &v, prefix...)
+	err := parse(s, &v)
 	return v, err
 }

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The SemVer compliance for "development versions" originating from a pre-release
+* The SemVer compliance for "development versions" originating from a pre-release
   tag has been improved. Previously the pre-release version has been incremented
   before attaching the `dev.X` suffix. As pointed out by @choffmeister this results
   in a not compliant version sorting since
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   set, if all of the preceding identifiers are equal [1]. A development version
   originating from the tag `1.2.3-rc.1` will now result in `1.2.3-rc.1.dev.1`.
 
-- The dev-suffix added to a version that is derived from a tagged version is now 
+* The dev-suffix added to a version that is derived from a tagged version is now 
   formatted as `dev.X`. This will enforce proper sorting since dot-separted identifiers
   are compared individually and identifiers consisting only of digits will be compared
   numerically. So that
@@ -33,15 +33,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   works as expected. Thanks [@choffmeister](https://github.com/choffmeister).
 
-- The size of the docker image has been reduced to 25MB by [@choffmeister](https://github.com/choffmeister).
+* The size of the docker image has been reduced to 25MB by [@choffmeister](https://github.com/choffmeister).
+* The commonly used prefix "v" will be automatically detected by the parser now and the
+  `-prefix` option is now only used to add a prefix that was not part of the tag before.
 
 
 ## [4.0.0] - 2020-04-10
 
 ### Changed
 
-- Use semantic import path versioning.
-- Allow tags to have a manually configured buildmeta section. E.g.: `v4.0.2-dev6+special`.
+* Use semantic import path versioning.
+* Allow tags to have a manually configured buildmeta section. E.g.: `v4.0.2-dev6+special`.
 
 
 
