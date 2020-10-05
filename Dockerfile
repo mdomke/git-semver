@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine3.12 as builder
+FROM golang:1.15-alpine3.12 as builder
 COPY . /go/src/github.com/mdomke/git-semver
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install github.com/mdomke/git-semver
 
