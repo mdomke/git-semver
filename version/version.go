@@ -102,27 +102,7 @@ func (v Version) PreRelease() string {
 	if v.preRelease == "" {
 		return fmt.Sprintf("dev.%d", v.Commits)
 	}
-	return fmt.Sprintf("%s.dev.%d", nextPreRelease(v.preRelease), v.Commits)
-}
-
-func nextPreRelease(r string) string {
-	re, err := regexp.Compile(`(.*?)(alpha|beta|rc)(\d+)`)
-	if err != nil {
-		return r
-	}
-	match := re.FindStringSubmatch(r)
-	if match == nil {
-		return r
-	}
-	prefix := match[1]
-	preRelease := match[2]
-	var n int
-	n, err = strconv.Atoi(match[3])
-	if err != nil {
-		return r
-	}
-	n++
-	return fmt.Sprintf("%s%s%d", prefix, preRelease, n)
+	return fmt.Sprintf("%s.dev.%d", v.preRelease, v.Commits)
 }
 
 func parseVersion(s string, v *Version) error {
