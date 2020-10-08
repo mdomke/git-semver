@@ -186,14 +186,22 @@ func TestDerive(t *testing.T) {
 	for _, test := range []struct {
 		s string
 		v Version
+		p []string
 	}{
 		{
 			"3.2.1-rc3-10-ge6c3c44",
 			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc3", Commits: 10, Meta: "ge6c3c44"},
+			[]string{},
+		},
+		{
+			"3.2.1",
+			Version{Prefix: "ver", Major: 3, Minor: 2, Patch: 1},
+			[]string{"ver"},
 		},
 	} {
 		git = gitFaker{test.s}
-		_, err := Derive()
+		v, err := Derive(test.p...)
 		assert.NoError(t, err)
+		assert.Equal(t, test.v, v)
 	}
 }
