@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   before attaching the `dev.X` suffix. As pointed out by @choffmeister this results
   in a not compliant version sorting since
 
-    1.2.3-rc.2.dev.1 > 1.2.3-rc.2
+      1.2.3-rc.2.dev.1 > 1.2.3-rc.2
 
   because a larger set of pre-release fields has a higher precedence than a smaller
   set, if all of the preceding identifiers are equal [1]. A development version
@@ -25,11 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are compared individually and identifiers consisting only of digits will be compared
   numerically. So that
 
-    dev1 < dev10 < dev2
+      dev1 < dev10 < dev2
 
   yields the wrong order whereas
 
-    dev.1 < dev.2 < dev.10
+      dev.1 < dev.2 < dev.10
 
   works as expected. Thanks [@choffmeister](https://github.com/choffmeister).
 
