@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [5.0.0] - 2020-10-08
 
 ### Changed
 
@@ -36,7 +36,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The size of the docker image has been reduced to 25MB by [@choffmeister](https://github.com/choffmeister).
 * The commonly used prefix "v" will be automatically detected by the parser now and the
   `-prefix` option is now only used to add a prefix that was not part of the tag before.
+* Moved from Travis to GitHub Actions.
 
+## [4.0.1] - 2020-06-05
+
+### Added
+
+* Publish binaries upon release [@schorzz](https://github.com/schorzz).
 
 ## [4.0.0] - 2020-04-10
 
@@ -46,5 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Allow tags to have a manually configured buildmeta section. E.g.: `v4.0.2-dev6+special`.
 
 
-
-1: https://semver.org/#spec-item-11
+[1]: https://semver.org/#spec-item-11
+[5.0.0]: https://github.com/mdomke/git-semver/compare/v4.0.1...v5.0.0
+[4.0.1]: https://github.com/mdomke/git-semver/compare/v4.0.0...v4.0.1
+[4.0.0]: https://github.com/mdomke/git-semver/compare/v3.1.1...v4.0.0
