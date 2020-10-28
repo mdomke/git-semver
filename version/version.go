@@ -109,95 +109,66 @@ func (v Version) PreRelease() string {
 	return fmt.Sprintf("%s.dev.%d", v.preRelease, v.Commits)
 }
 
-func parseVersion(s string, v *Version) error {
-	parts := strings.Split(s, ".")
+func NewFromHead(head *RepoHead) (Version, error) {
+	v := Version{Commits: head.CommitsSinceTag}
+	if strings.HasPrefix(head.LastTag, DefaultPrefix) {
+		v.Prefix = DefaultPrefix
+	}
+	version := strings.TrimPrefix(head.LastTag, v.Prefix)
+	if strings.Contains(version, "+") {
+		parts := strings.Split(version, "+")
+		version = parts[0]
+		v.Meta = parts[1]
+	} else if head.CommitsSinceTag > 0 {
+		v.Meta = head.Hash[:8]
+	}
+	if strings.Contains(version, "-") {
+		parts := strings.Split(version, "-")
+		version = parts[0]
+		v.preRelease = parts[1]
+	}
+
+	if version == "" {
+		v.Major = 0
+		v.Minor = 0
+		v.Patch = 0
+		return v, nil
+	}
+
+	parts := strings.Split(version, ".")
 	if len(parts) != 3 {
-		return fmt.Errorf("git version tag must contain 3 components: X.Y.Z: Got %s", s)
+		return v, fmt.Errorf("git version tag must contain 3 components: X.Y.Z: Got %s", version)
 	}
 	var err error
 	v.Major, err = strconv.Atoi(parts[0])
 	if err != nil {
-		return fmt.Errorf("Failed to parse major version: %v", err)
+		return v, fmt.Errorf("failed to parse major version: %v", err)
 	}
 	v.Minor, err = strconv.Atoi(parts[1])
 	if err != nil {
-		return fmt.Errorf("Failed to parse minor version: %v", err)
+		return v, fmt.Errorf("failed to parse minor version: %v", err)
 	}
 	v.Patch, err = strconv.Atoi(parts[2])
 	if err != nil {
-		return fmt.Errorf("Failed to parse patch version: %v", err)
+		return v, fmt.Errorf("failed to parse patch version: %v", err)
 	}
-	return nil
+	return v, nil
 }
 
-func parse(s string, v *Version) error {
-	if strings.HasPrefix(s, DefaultPrefix) {
-		v.Prefix = DefaultPrefix
-	}
-	s = strings.TrimPrefix(s, v.Prefix)
-	var version string
-	if strings.Contains(s, "-") {
-		parts := strings.Split(s, "-")
-
-		var commits string
-		version, v.Meta = splitMeta(parts[0])
-		switch len(parts) {
-		case 2:
-			v.preRelease, v.Meta = splitMeta(parts[1])
-		case 3:
-			commits = parts[1]
-			v.Meta = parts[2]
-		case 4:
-			v.preRelease, v.Meta = splitMeta(parts[1])
-			commits = parts[2]
-			if v.Meta == "" {
-				v.Meta = parts[3]
-			}
-		default:
-			return fmt.Errorf("invalid git version must be of format X.Y.Z(+meta)?(-<pre>)?(-n-<hash>)?: Got %s", s)
-		}
-
-		if commits != "" {
-			var err error
-			v.Commits, err = strconv.Atoi(commits)
-			if err != nil {
-				return fmt.Errorf("failed to parse commit count from %s: %v", s, err)
-			}
-		}
-	} else {
-		version, v.Meta = splitMeta(s)
-	}
-	return parseVersion(version, v)
-}
-
-func splitMeta(s string) (string, string) {
-	meta := ""
-	if !strings.Contains(s, "+") {
-		return s, meta
-	}
-	parts := strings.Split(s, "+")
-	if len(parts) >= 2 {
-		s = parts[0]
-		meta = strings.Join(parts[1:], "")
-	}
-	return s, meta
-}
-
-// Derive calculates a semantic version from the output of git describe.
+// NewFromRepo calculates a semantic version for the head commit of the repo at path.
 // If the latest commit is not tagged, the version will have a pre-release-suffix
 // appended to it (e.g.: 1.2.3-dev.3+fcf2c8f). The suffix has the format dev.<n>+<hash>,
 // whereas n is the number of commits since the last tag and hash is the commit hash
-// of the latest commit. Derive will also increment the patch-level version component
+// of the latest commit. NewFromRepo will also increment the patch-level version component
 // in case it detects that the current version is a pre-release.
-// If the last tag has itself a pre-releas-identifier and the last commit is not tagged,
-// Derive will not increment the patch-level version.
+// If the last tag has itself a pre-release-identifier and the last commit is not tagged,
+// NewFromRepo will not increment the patch-level version.
 // The not SemVer commpliant but commonly used prefix v will be automatically detected.
-func Derive(prefix ...string) (Version, error) {
-	v := Version{}
-	if len(prefix) == 1 {
-		v.Prefix = prefix[0]
+func NewFromRepo(path string) (Version, error) {
+	head, err := GitDescribe(path)
+	if err != nil {
+		return Version{}, err
 	}
-	s := git.Describe()
-	err := parse(s, &v)
+	v, err := NewFromHead(head)
 	return v, err
 }

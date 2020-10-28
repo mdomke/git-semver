@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mdomke/git-semver/v5/version"
+	"github.com/mdomke/git-semver/v6/version"
 )
 
 var prefix = flag.String("prefix", "", "prefix of version string e.g. v (default: none)")
@@ -16,6 +16,13 @@ var setMeta = flag.String("set-meta", "", "set build metadata (default: none)")
 var excludePreRelease = flag.Bool("no-pre", false, "exclude pre-release version (default: false)")
 var excludePatch = flag.Bool("no-patch", false, "exclude pre-release version (default: false)")
 var excludeMinor = flag.Bool("no-minor", false, "exclude pre-release version (default: false)")
+
+func init() {
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [opts] [<repo>]\n\nOptions:\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+}
 
 func selectFormat() string {
 	if *format != "" {
@@ -39,7 +46,16 @@ func selectFormat() string {
 
 func main() {
 	flag.Parse()
-	v, err := version.Derive()
+	repoPath := flag.Arg(0)
+	if repoPath == "" {
+		var err error
+		repoPath, err = os.Getwd()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+	}
+	v, err := version.NewFromRepo(repoPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

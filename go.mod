@@ -1,5 +1,8 @@
-module github.com/mdomke/git-semver/v5
+module github.com/mdomke/git-semver/v6
 
 go 1.15
 
-require github.com/stretchr/testify v1.3.0
+require (
+	github.com/go-git/go-git/v5 v5.2.0
+	github.com/stretchr/testify v1.4.0
+)

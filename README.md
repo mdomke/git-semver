@@ -14,7 +14,7 @@ order to attach a meaning to a version number or the change thereof.
 
 [git](https://git-scm.com/) allows you to conveniently reference a certain
 state of your code through the usage of tags. Tags can have an arbitrary
-identifier, so that it seems a naturaly choice of using them for versioning.
+identifier, so that it seems a natural choice to use them for versioning.
 
 ## Version tags
 
@@ -50,19 +50,25 @@ Sadly this identifier has two drawbacks.
 
 ## git-semver
 
-`git-semver` parses the output of `git describe` and derives a proper SemVer compliant
-version from it. E.g.:
+`git-semver` collects information about the head commit of a repo similar to how
+`git describe` would do it and derives a SemVer compliant version from it. E.g.:
 
-```
-3.5.1-22-gbaf822dd5 -> 3.5.2-dev.22+gbaf822dd5
-4.2.0-rc3-5-fcf2c8f -> 4.2.0-rc4.dev.5-fcf2c8f
-```
+| `git describe`        | `git-semver`              |
+| ---                   | ---                       |
+| 3.5.1-22-gbaf822d     | 3.5.2-dev.22+baf822dd     |
+| 4.2.0-rc.3-5-gfcf2c8f | 4.2.0-rc.3.dev.5+fcf2c8fd |
+| 1.0.1                 | 1.0.1                     |
 
 It will attach a pre-release tag of the form `dev.N`, where `N` is the number of commits
 since the last commit, and the commit hash as build-metadata. Additionally the patch level
 component will be incremented in case of a pre-release-version. If the last tag itself
-contains a pre-release-identifier of the form `(alpha|beta|rc)\d+`, that identifier will
-be incremnted instead of the patch-level.
+contains a pre-release-identifier the `dev.N` suffix will be appended but all other parts
+will be left untouched. This complies with the [precedence rules](https://semver.org/#spec-item-11)
+defined in the SemVer spec. So that
+
+```
+0.9.9 < 1.0.0-rc.1 < 1.0.0-rc1.dev.3+fcf2c8fd < 1.0.0-rc.2 < 1.0.0
+```
 
 ### Formatting
 
