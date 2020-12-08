@@ -40,7 +40,7 @@ func GitDescribe(path string) (*RepoHead, error) {
 
 	commits, err := repo.Log(&git.LogOptions{
 		From:  head.Hash(),
-		Order: git.LogOrderDefault,
+		Order: git.LogOrderCommitterTime,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list commits: %w", err)

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.1] - 2020-12-08
+
+### Fixed
+
+* The default log sort-order was finding the wrong tag. Switching to commiter time
+  based sorting improves the situation, but eventually the concrete algorithm from
+  git describe has to be reimplemented.
+
 ## [6.0.0] - 2020-10-28
 
 * Remove external dependency to git with a pure Go based implemenation.
