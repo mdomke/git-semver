@@ -16,6 +16,9 @@ var setMeta = flag.String("set-meta", "", "set build metadata (default: none)")
 var excludePreRelease = flag.Bool("no-pre", false, "exclude pre-release version (default: false)")
 var excludePatch = flag.Bool("no-patch", false, "exclude pre-release version (default: false)")
 var excludeMinor = flag.Bool("no-minor", false, "exclude pre-release version (default: false)")
+var nextMajor = flag.Bool("next-major", false, "increase major version (default: false)")
+var nextMinor = flag.Bool("next-minor", false, "increase minor version (default: false)")
+var nextPatch = flag.Bool("next-patch", false, "increase patch version (default: false)")
 
 func init() {
 	flag.Usage = func() {
@@ -66,7 +69,12 @@ func main() {
 	if *prefix != "" {
 		v.Prefix = *prefix
 	}
-	s, err := v.Format(selectFormat())
+	bumpOptions := version.BumpOptions{
+		IncreaseMajor: *nextMajor,
+		IncreaseMinor: *nextMinor,
+		IncreasePatch: *nextPatch,
+	}
+	s, err := v.Format(selectFormat(), bumpOptions)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

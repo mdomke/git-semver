@@ -32,6 +32,13 @@ func (b *buffer) AppendString(s string, sep byte) {
 	*b = append(*b, s...)
 }
 
+// BumpOptions tells whether to increment a specific part of the version
+type BumpOptions struct {
+	IncreaseMajor bool
+	IncreaseMinor bool
+	IncreasePatch bool
+}
+
 // Version holds the parsed components of git describe
 type Version struct {
 	Prefix     string
@@ -52,7 +59,7 @@ type Version struct {
 // * m -> metadata
 // x, y and z are separated by a dot. p is seprated by a hyphen and m by a plus sing.
 // E.g.: x.y.z-p+m or x.y
-func (v Version) Format(format string) (string, error) {
+func (v Version) Format(format string, opts BumpOptions) (string, error) {
 	re := regexp.MustCompile(
 		`(?P<major>x)(?P<minor>\.y)?(?P<patch>\.z)?(?P<pre>-p)?(?P<meta>\+m)?`)
 
@@ -70,12 +77,24 @@ func (v Version) Format(format string) (string, error) {
 		}
 		switch names[i] {
 		case "major":
-			buf.AppendInt(v.Major, '.')
+			major := v.Major
+			if opts.IncreaseMajor {
+				major++
+			}
+			buf.AppendInt(major, '.')
 		case "minor":
-			buf.AppendInt(v.Minor, '.')
+			minor := v.Minor
+			if opts.IncreaseMajor {
+				minor = 0
+			} else if opts.IncreaseMinor {
+				minor++
+			}
+			buf.AppendInt(minor, '.')
 		case "patch":
 			patch := v.Patch
-			if v.Commits > 0 && v.preRelease == "" {
+			if opts.IncreaseMajor || opts.IncreaseMinor {
+				patch = 0
+			} else if v.Commits > 0 && v.preRelease == "" || opts.IncreasePatch {
 				patch++
 			}
 			buf.AppendInt(patch, '.')
@@ -89,7 +108,8 @@ func (v Version) Format(format string) (string, error) {
 }
 
 func (v Version) String() string {
-	result, err := v.Format(FullFormat)
+	bumpOptions := BumpOptions{false, false, false}
+	result, err := v.Format(FullFormat, bumpOptions)
 	if err != nil {
 		return ""
 	}
