@@ -1,7 +1,6 @@
-FROM golang:1.15-alpine3.12 as builder
+FROM golang:1.16-buster as builder
 ENV USER=semver
 ENV UID=10001
-RUN apk update && apk add --no-cache git
 RUN adduser \
  --disabled-password \
  --gecos "" \
