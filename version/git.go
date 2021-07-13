@@ -38,6 +38,11 @@ func GitDescribe(path string) (*RepoHead, error) {
 		return nil, fmt.Errorf("failed to retrieve tag-list: %w", err)
 	}
 
+	if tag, found := tags[ref.Hash]; found {
+		ref.LastTag = tag
+		return &ref, nil
+	}
+
 	commits, err := repo.Log(&git.LogOptions{
 		From:  head.Hash(),
 		Order: git.LogOrderCommitterTime,
@@ -47,7 +52,7 @@ func GitDescribe(path string) (*RepoHead, error) {
 	}
 
 	_ = commits.ForEach(func(c *object.Commit) error {
-		ref.LastTag = (*tags)[c.Hash.String()]
+		ref.LastTag = tags[c.Hash.String()]
 		if ref.LastTag != "" {
 			return storer.ErrStop
 		}
@@ -57,7 +62,7 @@ func GitDescribe(path string) (*RepoHead, error) {
 	return &ref, nil
 }
 
-func getTagMap(repo *git.Repository) (*map[string]string, error) {
+func getTagMap(repo *git.Repository) (map[string]string, error) {
 	tags, err := repo.Tags()
 	if err != nil {
 		return nil, err
@@ -81,5 +86,5 @@ func getTagMap(repo *git.Repository) (*map[string]string, error) {
 	}); err != nil {
 		return nil, fmt.Errorf("failed to list tags: %w", err)
 	}
-	return &result, nil
+	return result, nil
 }
