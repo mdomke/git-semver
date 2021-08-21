@@ -123,7 +123,7 @@ func NewFromHead(head *RepoHead) (Version, error) {
 		v.Meta = head.Hash[:8]
 	}
 	if strings.Contains(version, "-") {
-		parts := strings.Split(version, "-")
+		parts := strings.SplitN(version, "-", 2)
 		version = parts[0]
 		v.preRelease = parts[1]
 	}
