@@ -62,6 +62,10 @@ func TestParse(t *testing.T) {
 			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "liftoff.alpha.1", Commits: 3, Meta: "fcf2c8fa"},
 		},
 		{
+			RepoHead{LastTag: "3.5.0-liftoff-alpha.1"},
+			Version{Major: 3, Minor: 5, Patch: 0, preRelease: "liftoff-alpha.1"},
+		},
+		{
 			RepoHead{LastTag: "3.2.1+special"},
 			Version{Major: 3, Minor: 2, Patch: 1, Meta: "special"},
 		},
