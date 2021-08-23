@@ -9,7 +9,7 @@
 
 Software should be versioned in order to be able to identify a certain
 feature set or to know when a specific bug has been fixed. It is a good
-practice to use [Sementic Versioning](https://semver.org/) (SemVer) in
+practice to use [Semantic Versioning](https://semver.org/) (SemVer) in
 order to attach a meaning to a version number or the change thereof.
 
 [git](https://git-scm.com/) allows you to conveniently reference a certain
