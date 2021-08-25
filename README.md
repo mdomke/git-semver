@@ -1,6 +1,5 @@
 [![GitHub Actions](https://img.shields.io/github/workflow/status/mdomke/git-semver/lint-and-test)](https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test)
 [![Codecov](https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg)](https://codecov.io/gh/mdomke/git-semver)
-[![Docker](https://img.shields.io/docker/build/mdomke/git-semver.svg)](https://hub.docker.com/r/mdomke/git-semver)
 ![License](https://img.shields.io/github/license/mdomke/git-semver.svg)
 ![Tag](https://img.shields.io/github/tag/mdomke/git-semver.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mdomke/git-semver)](https://goreportcard.com/report/github.com/mdomke/git-semver)
