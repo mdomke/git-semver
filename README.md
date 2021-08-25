@@ -100,13 +100,14 @@ The output and parsing of `git-semver` can be controlled with the following opti
 | `-no-meta`/`-no-hash` | Exclude build metadata                                   |
 | `-prefix`             | Prefix string for version e.g.: v                        |
 | `-set-meta`           | Set buildmeta to this value                              |
+| `-guard`              | Ignore shorthand formats for pre-release versions        |
 
 
 #### Examples
 
 ```sh
 $ git-semver
-3.5.2-dev.22+gbaf822dd5
+3.5.2-dev.22+8eaec5d3
 
 # Exclude build metadata
 $ git-semver -no-meta
@@ -121,6 +122,33 @@ v3.5.2
 
 $ git-semver -set-meta custom
 3.5.2+custom
+```
+
+### Release safeguard
+
+If you use `git-semver` to automatically derive versions for your application and you
+want to provide convenient shorthand versions (e.g. `1.2`), so that it is easier to follow
+non-breaking updates, you might run into the problem that a pre-release version accidentally 
+overwrites a production version. This is because
+
+```sh
+# tag of HEAD commit: 1.2.2
+$ git-semver -no-patch
+1.2
+
+# tag of HEAD commit: 1.2.3-dev.1"
+$ git-semver -no-patch
+1.2
+```
+
+result in the same shorthand version. To mitigate this problem you can use the `-guard` option
+that will ignore any output format the doesn't contain the pre-release identifier if the current
+version is a pre-release version. E.g.
+
+```sh
+# tag of HEAD commit: 1.2.3-dev.1"
+$ git-semver -guard -no-patch
+1.2.3-dev.1+8eaec5d3
 ```
 
 ## Installation

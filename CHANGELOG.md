@@ -5,9 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.1.0] - 2021-08-25
+
+* A new flag `-guard` has been introduced to avoid accidentally overwriting production
+  versions with a pre-release version. Consider that we have a tag `1.2.3-rc.1` and invoke
+  `git-semver` with `-no-patch` we would get a the version `1.2`, which would overwrite a previous
+  version that was generated from the tag `1.2.2`. The `-guard` flag will enforce that the
+  pre-release identifier is always included in the output regardless of the usage of shorthand
+  options like `-no-patch`, `-no-pre`, etc.
+
 ## [6.0.3] - 2021-08-23
 
-* The prerelease tag was parsed incorrectly if it included another dash.  E.g.: `1.2.3-pre-release.1`
+* The pre-release tag was parsed incorrectly if it included another dash. E.g.: `1.2.3-pre-release.1`
   This has been fixed by [@ckoehn](https://github.com/ckoehn).
 
 ## [6.0.2] - 2021-07-13
@@ -76,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 [1]: https://semver.org/#spec-item-11
+[6.1.0]: https://github.com/mdomke/git-semver/compare/v6.0.3...v6.1.0
 [6.0.3]: https://github.com/mdomke/git-semver/compare/v6.0.2...v6.0.3
 [6.0.2]: https://github.com/mdomke/git-semver/compare/v6.0.1...v6.0.2
 [6.0.1]: https://github.com/mdomke/git-semver/compare/v6.0.0...v6.0.1
