@@ -15,6 +15,17 @@ order to attach a meaning to a version number or the change thereof.
 state of your code through the usage of tags. Tags can have an arbitrary
 identifier, so that it seems a natural choice to use them for versioning.
 
+---
+
+* [Version tags](#version-tags)
+* [Usage](#git-semver)
+   * [Formatting](#formatting)
+   * [Command line options](#command-line-options)
+   * [Release safeguard](#release-safeguard)
+* [Installation](#installation)
+* [Docker usage](#docker-usage)
+
+
 ## Version tags
 
 A semantic version consists of three dot-separated parts `<major>.<minor>.<patch>`
@@ -160,8 +171,16 @@ $ go get github.com/mdomke/git-semver
 
 ## Docker usage
 
-You can also use `git-semver` as a docker-container. E.g.
+You can also use `git-semver` as a docker-container. Images are available from [DockerHub][1] and
+[GitHub Container Registry][2]
 
 ```sh
 docker run --rm -v `pwd`:/git-semver mdomke/git-semver
 ```
+or
+```sh
+docker run --rm -v `pwd`:/git-semver ghcr.io/mdomke/git-semver
+```
+
+[1]: https://hub.docker.com/r/mdomke/git-semver
+[2]: https://github.com/mdomke/git-semver/pkgs/container/git-semver
