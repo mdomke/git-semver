@@ -125,7 +125,6 @@ func main() {
 	}
 
 	var path string
-
 	if len(cfg.args) > 0 {
 		path = cfg.args[0]
 	}
