@@ -123,5 +123,11 @@ func main() {
 		}
 		os.Exit(2)
 	}
-	os.Exit(handle(cfg, flag.Arg(0)))
+
+	var path string
+
+	if len(cfg.args) > 0 {
+		path = cfg.args[0]
+	}
+	os.Exit(handle(cfg, path))
 }
