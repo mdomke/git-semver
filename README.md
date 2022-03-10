@@ -63,11 +63,11 @@ Sadly this identifier has two drawbacks.
 `git-semver` collects information about the head commit of a repo similar to how
 `git describe` would do it and derives a SemVer compliant version from it. E.g.:
 
-| `git describe`        | `git-semver`              |
-| ---                   | ---                       |
-| 3.5.1-22-gbaf822d     | 3.5.2-dev.22+baf822dd     |
-| 4.2.0-rc.3-5-gfcf2c8f | 4.2.0-rc.3.dev.5+fcf2c8fd |
-| 1.0.1                 | 1.0.1                     |
+| `git describe`          | `git-semver`                |
+| ---                     | ---                         |
+| `3.5.1-22-gbaf822d`     | `3.5.2-dev.22+baf822dd`     |
+| `4.2.0-rc.3-5-gfcf2c8f` | `4.2.0-rc.3.dev.5+fcf2c8fd` |
+| `1.0.1`                 | `1.0.1`                     |
 
 It will attach a pre-release tag of the form `dev.N`, where `N` is the number of commits
 since the last commit, and the commit hash as build-metadata. Additionally the patch level
