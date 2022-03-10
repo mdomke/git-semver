@@ -13,3 +13,5 @@
 
 /git-semver
 /coverage.txt
+
+dist/

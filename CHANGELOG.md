@@ -5,15 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.2.0] - 2022-03-10
+### Added
+* Also build binaries for Windows
+
 ## [6.1.1] - 2021-09-16
 ### Fixed
-
 * The ability to point `git-semver` to a different repository location was broken in 6.1.0
   and has been fixed by [@masonkatz](https://github.com/masonkatz).
 
 ## [6.1.0] - 2021-08-25
 ### Added
-
 * A new flag `-guard` has been introduced to avoid accidentally overwriting production
   versions with a pre-release version. Consider that we have a tag `1.2.3-rc.1` and invoke
   `git-semver` with `-no-patch` we would get a the version `1.2`, which would overwrite a previous
@@ -23,32 +25,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.0.3] - 2021-08-23
 ### Fixed
-
 * The pre-release tag was parsed incorrectly if it included another dash. E.g.: `1.2.3-pre-release.1`
   This has been fixed by [@ckoehn](https://github.com/ckoehn).
 
 ## [6.0.2] - 2021-07-13
 ### Changed
-
 * Upgrade Golang to 1.16 and `go-git` to 5.4.2
 * Upgrade golangci-lint to `v1.41` and fix some linting errors.
 * Switch to `golang:1.16-buster` as builder-image
 
 ## [6.0.1] - 2020-12-08
 ### Fixed
-
 * The default log sort-order was finding the wrong tag. Switching to commiter time
   based sorting improves the situation, but eventually the concrete algorithm from
   git describe has to be reimplemented.
 
 ## [6.0.0] - 2020-10-28
 ### Changed
-
 * Remove external dependency to git with a pure Go based implemenation.
 
 ## [5.0.0] - 2020-10-08
 ### Changed
-
 * The SemVer compliance for "development versions" originating from a pre-release
   tag has been improved. Previously the pre-release version has been incremented
   before attaching the `dev.X` suffix. As pointed out by @choffmeister this results
@@ -59,7 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   because a larger set of pre-release fields has a higher precedence than a smaller
   set, if all of the preceding identifiers are equal [1]. A development version
   originating from the tag `1.2.3-rc.1` will now result in `1.2.3-rc.1.dev.1`.
-
 * The dev-suffix added to a version that is derived from a tagged version is now
   formatted as `dev.X`. This will enforce proper sorting since dot-separted identifiers
   are compared individually and identifiers consisting only of digits will be compared
@@ -80,17 +76,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.1] - 2020-06-05
 ### Added
-
 * Publish binaries upon release [@schorzz](https://github.com/schorzz).
 
 ## [4.0.0] - 2020-04-10
 ### Changed
-
 * Use semantic import path versioning.
 * Allow tags to have a manually configured buildmeta section. E.g.: `v4.0.2-dev6+special`.
 
 
 [1]: https://semver.org/#spec-item-11
+[6.2.0]: https://github.com/mdomke/git-semver/compare/v6.1.1...v6.2.0
 [6.1.1]: https://github.com/mdomke/git-semver/compare/v6.1.0...v6.1.1
 [6.1.0]: https://github.com/mdomke/git-semver/compare/v6.0.3...v6.1.0
 [6.0.3]: https://github.com/mdomke/git-semver/compare/v6.0.2...v6.0.3
