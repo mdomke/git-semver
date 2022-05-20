@@ -163,10 +163,17 @@ $ git-semver -guard -no-patch
 
 ## Installation
 
-Currently `git-semver` can be installed with `go get`
+Currently `git-semver` can be installed with `go install`
 
 ```sh
-$ go get github.com/mdomke/git-semver
+$ go install github.com/mdomke/git-semver/v6@latest
+```
+
+There is also a [Homebrew](https://brew.sh/) formula that can be installed with
+
+```sh
+$ brew tap mdomke/git-semver
+$ brew install git-semver
 ```
 
 ## Docker usage

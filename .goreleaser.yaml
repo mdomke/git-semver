@@ -17,3 +17,11 @@ archives:
       amd64: x86_64
 checksum:
   name_template: "checksums.txt"
+brews:
+  - name: git-semver
+    description: Automatically derive semantic versions from Git tags.
+    homepage: https://github.com/mdomke/git-semver
+    tap:
+      owner: mdomke
+      name: homebrew-git-semver
+    skip_upload: auto
