@@ -2,6 +2,7 @@ package version
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -10,7 +11,7 @@ import (
 )
 
 // RepoHead provides statistics about the head commit of a git
-// repository like its commit-ash, the number of commits since
+// repository like its commit-hash, the number of commits since
 // the last tag and the name of the last tag.
 type RepoHead struct {
 	LastTag         string
@@ -39,7 +40,7 @@ func GitDescribe(path string) (*RepoHead, error) {
 	}
 
 	if tag, found := tags[ref.Hash]; found {
-		ref.LastTag = tag
+		ref.LastTag = tag.Name
 		return &ref, nil
 	}
 
@@ -52,8 +53,9 @@ func GitDescribe(path string) (*RepoHead, error) {
 	}
 
 	_ = commits.ForEach(func(c *object.Commit) error {
-		ref.LastTag = tags[c.Hash.String()]
-		if ref.LastTag != "" {
+		tag, ok := tags[c.Hash.String()]
+		if ok {
+			ref.LastTag = tag.Name
 			return storer.ErrStop
 		}
 		ref.CommitsSinceTag += 1
@@ -62,12 +64,17 @@ func GitDescribe(path string) (*RepoHead, error) {
 	return &ref, nil
 }
 
-func getTagMap(repo *git.Repository) (map[string]string, error) {
+type Tag struct {
+	Name string
+	When time.Time
+}
+
+func getTagMap(repo *git.Repository) (map[string]Tag, error) {
 	tags, err := repo.Tags()
 	if err != nil {
 		return nil, err
 	}
-	result := make(map[string]string)
+	result := make(map[string]Tag)
 	if err = tags.ForEach(func(r *plumbing.Reference) error {
 		tag, err := repo.TagObject(r.Hash())
 		switch err {
@@ -76,9 +83,21 @@ func getTagMap(repo *git.Repository) (map[string]string, error) {
 			if err != nil {
 				return nil
 			}
-			result[commit.Hash.String()] = tag.Name
+			hash := commit.Hash.String()
+			if t, ok := result[hash]; ok && !tag.Tagger.When.After(t.When) {
+				return nil
+			}
+			result[hash] = Tag{Name: tag.Name, When: tag.Tagger.When}
 		case plumbing.ErrObjectNotFound:
-			result[r.Hash().String()] = r.Name().Short()
+			commit, err := repo.CommitObject(r.Hash())
+			if err != nil {
+				return nil
+			}
+			hash := commit.Hash.String()
+			if c, ok := result[hash]; ok && !commit.Committer.When.After(c.When) {
+				return nil
+			}
+			result[hash] = Tag{Name: r.Name().Short(), When: commit.Committer.When}
 		default:
 			return err
 		}

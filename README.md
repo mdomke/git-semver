@@ -152,13 +152,28 @@ $ git-semver -no-patch
 ```
 
 result in the same shorthand version. To mitigate this problem you can use the `-guard` option
-that will ignore any output format the doesn't contain the pre-release identifier if the current
+that will ignore any output format that doesn't contain the pre-release identifier if the current
 version is a pre-release version. E.g.
 
 ```sh
 # tag of HEAD commit: 1.2.3-dev.1"
 $ git-semver -guard -no-patch
 1.2.3-dev.1+8eaec5d3
+```
+
+### Caveats
+
+If you create multiple annotated tags on the same commit (e.g. you want to promote a release candidate
+to be the final release without adding any further commits), `git-semver` will pick the tag that was
+created last, which is usually what you want. E.g.
+
+```sh
+$ git tag -a -m "Release candidate" 1.1.0-rc.1 
+$ git-semver
+1.1.0-rc.1
+$ git tag -a -m "Final release" 1.1.0
+$ git-semver
+1.1.0
 ```
 
 ## Installation
@@ -172,8 +187,7 @@ $ go install github.com/mdomke/git-semver/v6@latest
 There is also a [Homebrew](https://brew.sh/) formula that can be installed with
 
 ```sh
-$ brew tap mdomke/git-semver
-$ brew install git-semver
+$ brew install mdomke/git-semver/git-semver
 ```
 
 ## Docker usage

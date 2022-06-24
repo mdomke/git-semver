@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.3.0] - 2022-03-10
+### Changed
+* If two annotated tags point to the same commit `git-semver` will now select the one that
+  was created last. E.g.
+
+        $ git tag -a -m "Release candidate" 1.1.0-rc.1 
+        $ git-semver
+        1.1.0-rc.1
+        $ git tag -a -m "Final release" 1.1.0
+        $ git-semver
+        1.1.0
+
+  Previously the behavior was undefined. Thanks [@igor-petrik-invitae](https://github.com/igor-petrik-invitae)
+  for the issue report!
+
 ## [6.2.0] - 2022-03-10
 ### Added
 * Also build binaries for Windows
@@ -85,6 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 [1]: https://semver.org/#spec-item-11
+[6.3.0]: https://github.com/mdomke/git-semver/compare/v6.2.0...v6.3.0
 [6.2.0]: https://github.com/mdomke/git-semver/compare/v6.1.1...v6.2.0
 [6.1.1]: https://github.com/mdomke/git-semver/compare/v6.1.0...v6.1.1
 [6.1.0]: https://github.com/mdomke/git-semver/compare/v6.0.3...v6.1.0
