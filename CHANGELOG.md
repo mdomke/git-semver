@@ -5,7 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [6.4.0] - 2022-03-10
+## [6.5.0] - 2022-06-24
+### Changed
+* Use [distroless/static:nonroot](https://github.com/GoogleContainerTools/distroless/tree/main/base) as 
+  base image for the dockerized version of `git-semver` and build with Golang 1.18.
+
+## [6.4.0] - 2022-06-24
 ### Changed
 * If two annotated tags point to the same commit `git-semver` will now select the one that
   was created last. E.g.
@@ -106,6 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 [1]: https://semver.org/#spec-item-11
+[6.5.0]: https://github.com/mdomke/git-semver/compare/v6.4.0...v6.5.0
 [6.4.0]: https://github.com/mdomke/git-semver/compare/v6.3.0...v6.4.0
 [6.3.0]: https://github.com/mdomke/git-semver/compare/v6.2.0...v6.3.0
 [6.2.0]: https://github.com/mdomke/git-semver/compare/v6.1.1...v6.2.0
