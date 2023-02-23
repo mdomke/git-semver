@@ -1,7 +1,7 @@
 package version
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -12,7 +12,7 @@ import (
 
 func TestGitDescribe(t *testing.T) {
 	assert := assert.New(t)
-	dir, _ := ioutil.TempDir("", "example")
+	dir, _ := os.MkdirTemp("", "example")
 	repo, err := git.PlainInit(dir, false)
 	assert.NoError(err)
 
@@ -31,7 +31,11 @@ func TestGitDescribe(t *testing.T) {
 		Email: "john@doe.org",
 		When:  now,
 	}
-	opts := git.CommitOptions{Author: author, Committer: author}
+	opts := git.CommitOptions{
+		Author:            author,
+		Committer:         author,
+		AllowEmptyCommits: true,
+	}
 
 	commit1, err := worktree.Commit("first commit", &opts)
 	assert.NoError(err)
@@ -93,7 +97,7 @@ func TestGitDescribe(t *testing.T) {
 
 func TestGitDescribeError(t *testing.T) {
 	assert := assert.New(t)
-	dir, _ := ioutil.TempDir("", "example")
+	dir, _ := os.MkdirTemp("", "example")
 
 	test := func(msg string) {
 		head, err := GitDescribe(dir)
