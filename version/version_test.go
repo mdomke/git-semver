@@ -8,7 +8,7 @@ import (
 
 func TestNewVersion(t *testing.T) {
 	assert := assert.New(t)
-	v, err := NewFromHead(&RepoHead{LastTag: "1.2.3"})
+	v, err := NewFromHead(&RepoHead{LastTag: "1.2.3"}, "")
 	assert.NoError(err)
 	assert.Equal(Version{Major: 1, Minor: 2, Patch: 3}, v)
 }
@@ -21,7 +21,7 @@ func TestNewVersionInvalid(t *testing.T) {
 		"1.a.3",
 		"a.2.3",
 	} {
-		_, err := NewFromHead(&RepoHead{LastTag: s})
+		_, err := NewFromHead(&RepoHead{LastTag: s}, "")
 		assert.Error(err)
 	}
 }
@@ -30,55 +30,61 @@ func TestParse(t *testing.T) {
 	assert := assert.New(t)
 
 	for _, test := range []struct {
-		ref RepoHead
-		v   Version
+		ref    RepoHead
+		v      Version
+		prefix string
 	}{
 		{
-			RepoHead{LastTag: "1.2.3", CommitsSinceTag: 4, Hash: "fcf2c8fa"},
-			Version{Major: 1, Minor: 2, Patch: 3, Commits: 4, Meta: "fcf2c8fa"},
+			ref: RepoHead{LastTag: "1.2.3", CommitsSinceTag: 4, Hash: "fcf2c8fa"},
+			v:   Version{Major: 1, Minor: 2, Patch: 3, Commits: 4, Meta: "fcf2c8fa"},
 		},
 		{
-			RepoHead{},
-			Version{},
+			ref: RepoHead{},
+			v:   Version{},
 		},
 		{
-			RepoHead{LastTag: "1.2.3-rc.1"},
-			Version{Major: 1, Minor: 2, Patch: 3, preRelease: "rc.1"},
+			ref: RepoHead{LastTag: "1.2.3-rc.1"},
+			v:   Version{Major: 1, Minor: 2, Patch: 3, preRelease: "rc.1"},
 		},
 		{
-			RepoHead{LastTag: "1.2.3-rc.1", CommitsSinceTag: 2, Hash: "gd92f0b2"},
-			Version{Major: 1, Minor: 2, Patch: 3, preRelease: "rc.1", Commits: 2, Meta: "gd92f0b2"},
+			ref: RepoHead{LastTag: "1.2.3-rc.1", CommitsSinceTag: 2, Hash: "gd92f0b2"},
+			v:   Version{Major: 1, Minor: 2, Patch: 3, preRelease: "rc.1", Commits: 2, Meta: "gd92f0b2"},
 		},
 		{
-			RepoHead{LastTag: "3.2.1"},
-			Version{Major: 3, Minor: 2, Patch: 1},
+			ref: RepoHead{LastTag: "3.2.1"},
+			v:   Version{Major: 3, Minor: 2, Patch: 1},
 		},
 		{
-			RepoHead{LastTag: "v3.2.1"},
-			Version{Prefix: "v", Major: 3, Minor: 2, Patch: 1},
+			ref: RepoHead{LastTag: "v3.2.1"},
+			v:   Version{Prefix: "v", Major: 3, Minor: 2, Patch: 1},
 		},
 		{
-			RepoHead{LastTag: "3.2.1-liftoff.alpha.1", CommitsSinceTag: 3, Hash: "fcf2c8fa"},
-			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "liftoff.alpha.1", Commits: 3, Meta: "fcf2c8fa"},
+			ref:    RepoHead{LastTag: "ver3.2.1"},
+			v:      Version{Prefix: "ver", Major: 3, Minor: 2, Patch: 1},
+			prefix: "ver",
 		},
 		{
-			RepoHead{LastTag: "3.5.0-liftoff-alpha.1"},
-			Version{Major: 3, Minor: 5, Patch: 0, preRelease: "liftoff-alpha.1"},
+			ref: RepoHead{LastTag: "3.2.1-liftoff.alpha.1", CommitsSinceTag: 3, Hash: "fcf2c8fa"},
+			v:   Version{Major: 3, Minor: 2, Patch: 1, preRelease: "liftoff.alpha.1", Commits: 3, Meta: "fcf2c8fa"},
 		},
 		{
-			RepoHead{LastTag: "3.2.1+special"},
-			Version{Major: 3, Minor: 2, Patch: 1, Meta: "special"},
+			ref: RepoHead{LastTag: "3.5.0-liftoff-alpha.1"},
+			v:   Version{Major: 3, Minor: 5, Patch: 0, preRelease: "liftoff-alpha.1"},
 		},
 		{
-			RepoHead{LastTag: "3.2.1-rc.2+special"},
-			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc.2", Meta: "special"},
+			ref: RepoHead{LastTag: "3.2.1+special"},
+			v:   Version{Major: 3, Minor: 2, Patch: 1, Meta: "special"},
 		},
 		{
-			RepoHead{LastTag: "3.2.1-rc.2+special", CommitsSinceTag: 3, Hash: "gd92f0b2"},
-			Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc.2", Commits: 3, Meta: "special"},
+			ref: RepoHead{LastTag: "3.2.1-rc.2+special"},
+			v:   Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc.2", Meta: "special"},
+		},
+		{
+			ref: RepoHead{LastTag: "3.2.1-rc.2+special", CommitsSinceTag: 3, Hash: "gd92f0b2"},
+			v:   Version{Major: 3, Minor: 2, Patch: 1, preRelease: "rc.2", Commits: 3, Meta: "special"},
 		},
 	} {
-		v, err := NewFromHead(&test.ref)
+		v, err := NewFromHead(&test.ref, test.prefix)
 		assert.NoError(err)
 		assert.Equal(test.v, v)
 	}
@@ -97,6 +103,10 @@ func TestString(t *testing.T) {
 		{
 			Version{Major: 0, Minor: 3, Patch: 1},
 			"0.3.1",
+		},
+		{
+			Version{Prefix: "v", Major: 0, Minor: 3, Patch: 1},
+			"v0.3.1",
 		},
 		{
 			Version{Major: 1, Minor: 3, Patch: 0, preRelease: "rc.3"},

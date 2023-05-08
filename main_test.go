@@ -47,6 +47,10 @@ func TestParseFlags(t *testing.T) {
 			cfg:  &Config{excludeMinor: true, args: []string{}},
 		},
 		{
+			args: []string{"-no-prefix"},
+			cfg:  &Config{excludePrefix: true, args: []string{}},
+		},
+		{
 			args: []string{"-set-meta", "finleap"},
 			cfg:  &Config{setMeta: "finleap", args: []string{}},
 		},
@@ -196,8 +200,9 @@ func TestHandle(t *testing.T) {
 	})
 	t.Run("Prefix can be set", func(t *testing.T) {
 		cfg, buf := setup()
-		cfg.prefix = "ver"
+		cfg.prefix = "v"
 		retval := handle(cfg, "")
+		fmt.Println(buf.String())
 		assert.Equal(t, 0, retval)
 		assert.True(t, strings.HasPrefix(strings.TrimSpace(buf.String()), cfg.prefix))
 	})
