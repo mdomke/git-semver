@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.6.0] - 2023-05-08
+### Added
+* New flag `-no-prefix` to exclude the prefix (e.g. "v") from the printed version.
+
+### Changed
+* Use the `-prefix`-flag to allow parsing non-standard version prefixes (e.g. "ver")
+
 ## [6.5.0] - 2022-06-24
 ### Changed
 * Use [distroless/static:nonroot](https://github.com/GoogleContainerTools/distroless/tree/main/base) as 
@@ -44,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * A new flag `-guard` has been introduced to avoid accidentally overwriting production
   versions with a pre-release version. Consider that we have a tag `1.2.3-rc.1` and invoke
-  `git-semver` with `-no-patch` we would get a the version `1.2`, which would overwrite a previous
+  `git-semver` with `-no-patch` we would get the version `1.2`, which would overwrite a previous
   version that was generated from the tag `1.2.2`. The `-guard` flag will enforce that the
   pre-release identifier is always included in the output regardless of the usage of shorthand
   options like `-no-patch`, `-no-pre`, etc.
@@ -111,6 +118,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 [1]: https://semver.org/#spec-item-11
+[6.6.0]: https://github.com/mdomke/git-semver/compare/v6.5.0...v6.6.0
 [6.5.0]: https://github.com/mdomke/git-semver/compare/v6.4.0...v6.5.0
 [6.4.0]: https://github.com/mdomke/git-semver/compare/v6.3.0...v6.4.0
 [6.3.0]: https://github.com/mdomke/git-semver/compare/v6.2.0...v6.3.0

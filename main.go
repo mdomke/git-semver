@@ -14,6 +14,7 @@ import (
 type Config struct {
 	prefix            string
 	format            string
+	excludePrefix     bool
 	excludeHash       bool
 	excludeMeta       bool
 	setMeta           string
@@ -42,6 +43,7 @@ func parseFlags(progname string, args []string) (*Config, string, error) {
 	flags.BoolVar(&cfg.excludePreRelease, "no-pre", false, "exclude pre-release version (default: false)")
 	flags.BoolVar(&cfg.excludePatch, "no-patch", false, "exclude patch version (default: false)")
 	flags.BoolVar(&cfg.excludeMinor, "no-minor", false, "exclude pre-release version (default: false)")
+	flags.BoolVar(&cfg.excludePrefix, "no-prefix", false, "exclude version prefix (default: false)")
 	flags.BoolVar(&cfg.guardRelease, "guard", false, "ignore shorthand options if version contains pre-release (default: false)")
 	flags.Usage = func() {
 		fmt.Fprintf(flags.Output(), "Usage: %s [opts] [<repo>]\n\nOptions:\n", progname)
@@ -94,7 +96,7 @@ func handle(cfg *Config, repoPath string) int {
 			return 1
 		}
 	}
-	v, err := version.NewFromRepo(repoPath)
+	v, err := version.NewFromRepo(repoPath, cfg.prefix)
 	if err != nil {
 		fmt.Fprintln(cfg.stderr, err)
 		return 1
@@ -104,6 +106,9 @@ func handle(cfg *Config, repoPath string) int {
 	}
 	if cfg.prefix != "" {
 		v.Prefix = cfg.prefix
+	}
+	if cfg.excludePrefix {
+		v.Prefix = ""
 	}
 	s, err := v.Format(selectFormat(cfg, v))
 	if err != nil {

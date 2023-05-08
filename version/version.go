@@ -109,10 +109,13 @@ func (v Version) PreRelease() string {
 	return fmt.Sprintf("%s.dev.%d", v.preRelease, v.Commits)
 }
 
-func NewFromHead(head *RepoHead) (Version, error) {
+func NewFromHead(head *RepoHead, prefix string) (Version, error) {
 	v := Version{Commits: head.CommitsSinceTag}
-	if strings.HasPrefix(head.LastTag, DefaultPrefix) {
-		v.Prefix = DefaultPrefix
+	if prefix == "" {
+		prefix = DefaultPrefix
+	}
+	if strings.HasPrefix(head.LastTag, prefix) {
+		v.Prefix = prefix
 	}
 	version := strings.TrimPrefix(head.LastTag, v.Prefix)
 	if strings.Contains(version, "+") {
@@ -163,12 +166,13 @@ func NewFromHead(head *RepoHead) (Version, error) {
 // in case it detects that the current version is a pre-release.
 // If the last tag has itself a pre-release-identifier and the last commit is not tagged,
 // NewFromRepo will not increment the patch-level version.
-// The not SemVer commpliant but commonly used prefix v will be automatically detected.
-func NewFromRepo(path string) (Version, error) {
+// The prefix is an arbitrary string that is prepended to the version number. The not SemVer
+// commpliant but commonly used prefix v will be automatically detected.
+func NewFromRepo(path, prefix string) (Version, error) {
 	head, err := GitDescribe(path)
 	if err != nil {
 		return Version{}, err
 	}
-	v, err := NewFromHead(head)
+	v, err := NewFromHead(head, prefix)
 	return v, err
 }
