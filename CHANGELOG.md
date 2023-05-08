@@ -5,12 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [6.6.0] - 2023-05-08
+## [6.7.0] - 2023-05-08
 ### Added
 * New flag `-no-prefix` to exclude the prefix (e.g. "v") from the printed version.
 
 ### Changed
 * Use the `-prefix`-flag to allow parsing non-standard version prefixes (e.g. "ver")
+
+## [6.6.0] - 2023-05-08
+### Changed
+* Upgrade Golang to 1.20 and update dependencies.
 
 ## [6.5.0] - 2022-06-24
 ### Changed
@@ -118,6 +122,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 [1]: https://semver.org/#spec-item-11
+[6.6.0]: https://github.com/mdomke/git-semver/compare/v6.6.0...v6.7.0
 [6.6.0]: https://github.com/mdomke/git-semver/compare/v6.5.0...v6.6.0
 [6.5.0]: https://github.com/mdomke/git-semver/compare/v6.4.0...v6.5.0
 [6.4.0]: https://github.com/mdomke/git-semver/compare/v6.3.0...v6.4.0
