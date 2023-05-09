@@ -1,4 +1,4 @@
-[![GitHub Actions](https://img.shields.io/github/workflow/status/mdomke/git-semver/lint-and-test)](https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/mdomke/git-semver/lint-and-test.yaml?branch=master)](https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test)
 [![Codecov](https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg)](https://codecov.io/gh/mdomke/git-semver)
 ![License](https://img.shields.io/github/license/mdomke/git-semver.svg)
 ![Tag](https://img.shields.io/github/tag/mdomke/git-semver.svg)
