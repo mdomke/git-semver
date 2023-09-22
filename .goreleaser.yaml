@@ -14,7 +14,7 @@ brews:
   - name: git-semver
     description: Automatically derive semantic versions from Git tags.
     homepage: https://github.com/mdomke/git-semver
-    tap:
+    repository:
       owner: mdomke
       name: homebrew-git-semver
     skip_upload: auto
