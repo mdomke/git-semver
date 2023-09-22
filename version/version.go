@@ -168,8 +168,10 @@ func NewFromHead(head *RepoHead, prefix string) (Version, error) {
 // NewFromRepo will not increment the patch-level version.
 // The prefix is an arbitrary string that is prepended to the version number. The not SemVer
 // commpliant but commonly used prefix v will be automatically detected.
-func NewFromRepo(path, prefix string) (Version, error) {
-	head, err := GitDescribe(path)
+// The glob pattern can be used to limit the tags that are being considered in the calculation. The
+// pattern allows the syntax described for filepath.Match.
+func NewFromRepo(path, prefix, pattern string) (Version, error) {
+	head, err := GitDescribe(path, WithMatchPattern(pattern))
 	if err != nil {
 		return Version{}, err
 	}

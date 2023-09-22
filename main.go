@@ -22,6 +22,7 @@ type Config struct {
 	excludePatch      bool
 	excludeMinor      bool
 	guardRelease      bool
+	matchPattern      string
 	args              []string
 	stderr            io.Writer
 	stdout            io.Writer
@@ -36,6 +37,7 @@ func parseFlags(progname string, args []string) (*Config, string, error) {
 	flags := flag.NewFlagSet(progname, flag.ContinueOnError)
 	flags.SetOutput(&buf)
 	flags.StringVar(&cfg.prefix, "prefix", "", "prefix of version string e.g. v (default: none)")
+	flags.StringVar(&cfg.matchPattern, "match", "", "only consider tags matching glob pattern (e.g. v1.2.*)")
 	flags.StringVar(&cfg.format, "format", "", "format string (e.g.: x.y.z-p+m)")
 	flags.BoolVar(&cfg.excludeHash, "no-hash", false, "exclude commit hash (default: false)")
 	flags.BoolVar(&cfg.excludeMeta, "no-meta", false, "exclude build metadata (default: false)")
@@ -96,7 +98,7 @@ func handle(cfg *Config, repoPath string) int {
 			return 1
 		}
 	}
-	v, err := version.NewFromRepo(repoPath, cfg.prefix)
+	v, err := version.NewFromRepo(repoPath, cfg.prefix, cfg.matchPattern)
 	if err != nil {
 		fmt.Fprintln(cfg.stderr, err)
 		return 1

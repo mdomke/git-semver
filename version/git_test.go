@@ -19,8 +19,8 @@ func TestGitDescribe(t *testing.T) {
 	worktree, err := repo.Worktree()
 	assert.NoError(err)
 
-	test := func(expected *RepoHead) {
-		actual, err := GitDescribe(dir)
+	test := func(expected *RepoHead, opts ...Option) {
+		actual, err := GitDescribe(dir, opts...)
 		assert.NoError(err)
 		assert.Equal(expected, actual)
 	}
@@ -60,6 +60,12 @@ func TestGitDescribe(t *testing.T) {
 		Hash:            commit1.String(),
 		CommitsSinceTag: 0,
 	})
+
+	test(&RepoHead{
+		LastTag:         tag1.Name().Short(),
+		Hash:            commit1.String(),
+		CommitsSinceTag: 0,
+	}, WithMatchPattern("1.*.*"))
 
 	author.When = author.When.Add(1 * time.Hour)
 	commit2, err := worktree.Commit("second commit", &opts)

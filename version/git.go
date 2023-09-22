@@ -2,6 +2,7 @@ package version
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -19,9 +20,36 @@ type RepoHead struct {
 	Hash            string
 }
 
+type options struct {
+	matchFunc func(string) bool
+}
+
+type Option = func(*options)
+
+func WithMatchPattern(p string) Option {
+	return func(opts *options) {
+		opts.matchFunc = func(tagName string) bool {
+			if p == "" {
+				return true
+			}
+			matched, err := filepath.Match(p, tagName)
+			if err != nil {
+				fmt.Printf("Ignoring invalid match pattern: %s: %s\n", p, err)
+				return true
+			}
+			return matched
+		}
+	}
+}
+
 // GitDescribe looks at the git respository at path and figures
 // out versioning relvant information about the head commit.
-func GitDescribe(path string) (*RepoHead, error) {
+func GitDescribe(path string, opts ...Option) (*RepoHead, error) {
+	options := options{matchFunc: func(string) bool { return true }}
+	for _, apply := range opts {
+		apply(&options)
+	}
+
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open repo: %w", err)
@@ -34,7 +62,7 @@ func GitDescribe(path string) (*RepoHead, error) {
 	ref := RepoHead{
 		Hash: head.Hash().String(),
 	}
-	tags, err := getTagMap(repo)
+	tags, err := getTagMap(repo, options.matchFunc)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve tag-list: %w", err)
 	}
@@ -69,7 +97,7 @@ type Tag struct {
 	When time.Time
 }
 
-func getTagMap(repo *git.Repository) (map[string]Tag, error) {
+func getTagMap(repo *git.Repository, match func(string) bool) (map[string]Tag, error) {
 	tags, err := repo.Tags()
 	if err != nil {
 		return nil, err
@@ -87,7 +115,9 @@ func getTagMap(repo *git.Repository) (map[string]Tag, error) {
 			if t, ok := result[hash]; ok && !tag.Tagger.When.After(t.When) {
 				return nil
 			}
-			result[hash] = Tag{Name: tag.Name, When: tag.Tagger.When}
+			if match(tag.Name) {
+				result[hash] = Tag{Name: tag.Name, When: tag.Tagger.When}
+			}
 		case plumbing.ErrObjectNotFound:
 			commit, err := repo.CommitObject(r.Hash())
 			if err != nil {
@@ -97,7 +127,10 @@ func getTagMap(repo *git.Repository) (map[string]Tag, error) {
 			if c, ok := result[hash]; ok && !commit.Committer.When.After(c.When) {
 				return nil
 			}
-			result[hash] = Tag{Name: r.Name().Short(), When: commit.Committer.When}
+			tagName := r.Name().Short()
+			if match(tagName) {
+				result[hash] = Tag{Name: tagName, When: commit.Committer.When}
+			}
 		default:
 			return err
 		}
