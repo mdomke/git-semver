@@ -99,6 +99,16 @@ func TestGitDescribe(t *testing.T) {
 		Hash:            commit2.String(),
 		CommitsSinceTag: 0,
 	})
+
+	dir += "/subfoler"
+	err = os.Mkdir(dir, 0750)
+	assert.NoError(err)
+
+	test(&RepoHead{
+		LastTag:         tag3.Name().Short(),
+		Hash:            commit2.String(),
+		CommitsSinceTag: 0,
+	})
 }
 
 func TestGitDescribeError(t *testing.T) {

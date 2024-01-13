@@ -50,7 +50,8 @@ func GitDescribe(path string, opts ...Option) (*RepoHead, error) {
 		apply(&options)
 	}
 
-	repo, err := git.PlainOpen(path)
+	openOpts := git.PlainOpenOptions{DetectDotGit: true}
+	repo, err := git.PlainOpenWithOptions(path, &openOpts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open repo: %w", err)
 	}
