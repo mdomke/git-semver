@@ -129,40 +129,65 @@ func TestFormat(t *testing.T) {
 		f string
 		p string
 		s string
+		t TargetRelease
 	}{
 		{
 			FullFormat,
 			"",
 			"1.2.4-dev.10+fcf2c8f",
+			DefaultTargetRelease,
 		},
 		{
 			NoMetaFormat,
 			"",
 			"1.2.4-dev.10",
+			DefaultTargetRelease,
 		},
 		{
 			NoPreFormat,
 			"",
 			"1.2.4",
+			DefaultTargetRelease,
 		},
 		{
 			NoPatchFormat,
 			"",
 			"1.2",
+			DefaultTargetRelease,
 		},
 		{
 			NoMinorFormat,
 			"v",
 			"v1",
+			DefaultTargetRelease,
 		},
 		{
 			"x.y-p",
 			"v",
 			"v1.2-dev.10",
+			DefaultTargetRelease,
+		},
+		{
+			FullFormat,
+			"",
+			"1.2.4-dev.10+fcf2c8f",
+			TargetPatch,
+		},
+		{
+			FullFormat,
+			"",
+			"1.3.0-dev.10+fcf2c8f",
+			TargetMinor,
+		},
+		{
+			FullFormat,
+			"",
+			"2.0.0-dev.10+fcf2c8f",
+			TargetMajor,
 		},
 	} {
 		v.Prefix = test.p
-		s, err := v.Format(test.f)
+		s, err := v.Format(test.f, test.t)
 		assert.NoError(err)
 		assert.Equal(test.s, s)
 	}
@@ -170,7 +195,54 @@ func TestFormat(t *testing.T) {
 
 func TestInvalidFormat(t *testing.T) {
 	v := Version{Major: 1, Minor: 2, Patch: 3}
-	s, err := v.Format("q")
+	s, err := v.Format("q", DefaultTargetRelease)
 	assert.EqualError(t, err, "invalid format: q")
 	assert.Equal(t, "", s)
+}
+
+func TestTargetReleaseToString(t *testing.T) {
+	assert.PanicsWithError(t, "unexpected TargetRevision value 8", func() {
+		v := TargetRelease(8)
+		v.String()
+	})
+
+	{
+		v := TargetPatch
+		assert.Equal(t, "patch", v.String())
+	}
+
+	{
+		v := TargetMinor
+		assert.Equal(t, "minor", v.String())
+	}
+
+	{
+		v := TargetMajor
+		assert.Equal(t, "major", v.String())
+	}
+}
+
+func TestTargetReleaseFromString(t *testing.T) {
+	{
+		var v TargetRelease
+		assert.EqualError(t, v.Set("foo"), "parse error")
+	}
+
+	{
+		var v TargetRelease
+		assert.NoError(t, v.Set("patch"))
+		assert.Equal(t, TargetPatch, v)
+	}
+
+	{
+		var v TargetRelease
+		assert.NoError(t, v.Set("minor"))
+		assert.Equal(t, TargetMinor, v)
+	}
+
+	{
+		var v TargetRelease
+		assert.NoError(t, v.Set("major"))
+		assert.Equal(t, TargetMajor, v)
+	}
 }

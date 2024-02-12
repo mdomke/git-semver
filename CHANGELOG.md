@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [6.8.1] - ?
+## [6.9.0] - ?
+### Added
+* New flag `-target-revision` that can be used to select which version component will be bumped
+  if version sontains pre-release. Possible values are `patch` (default), `minor` and `major`.
+
 ### Fixed
 * An error was issued when invoked from subfolder of the repository whereas `git-describe` ususally succeeds in such cases.
 
