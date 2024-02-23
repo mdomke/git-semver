@@ -5,9 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [6.8.1] - ?
+## [6.9.0] - tbd
+### Changed
+* Updated `git-go` to v5.11.0
+
 ### Fixed
-* An error was issued when invoked from subfolder of the repository whereas `git-describe` ususally succeeds in such cases.
+* An error was issued when invoked from subfolder of the repository whereas `git-describe` usually
+  succeeds in such cases.
 
 ## [6.8.0] - 2023-09-22
 ### Added
@@ -131,6 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 [1]: https://semver.org/#spec-item-11
+[6.9.0]: https://github.com/mdomke/git-semver/compare/v6.8.1...v6.9.0
 [6.8.0]: https://github.com/mdomke/git-semver/compare/v6.7.0...v6.8.0
 [6.7.0]: https://github.com/mdomke/git-semver/compare/v6.6.0...v6.7.0
 [6.6.0]: https://github.com/mdomke/git-semver/compare/v6.5.0...v6.6.0
