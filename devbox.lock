@@ -1,0 +1,45 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "go@1.22": {
+      "last_modified": "2024-02-10T18:15:24Z",
+      "resolved": "github:NixOS/nixpkgs/10b813040df67c4039086db0f6eaf65c536886c6#go_1_22",
+      "source": "devbox-search",
+      "version": "1.22.0",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/8d918c8nf7f7lq08vgd3mwaa9xccz01a-go-1.22.0"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/czs9i91vs8lvqfp492ppls2dq5cfjnrz-go-1.22.0"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/a0yx16v64wm7wlk55fnf6vs7b0rqx8yr-go-1.22.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/v2hwzp398da6s8vwgckf59xxx0va00pc-go-1.22.0"
+        }
+      }
+    },
+    "golangci-lint@1.56": {
+      "last_modified": "2024-02-16T14:24:08Z",
+      "resolved": "github:NixOS/nixpkgs/c7763249f02b7786b4ca36e13a4d7365cfba162f#golangci-lint",
+      "source": "devbox-search",
+      "version": "1.56.2",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/wvz0nzagkyni0r3slizk6nbdsyzyr74k-golangci-lint-1.56.2"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/nvy66wlc0nl2z8szw14qfg38cnxi7i68-golangci-lint-1.56.2"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/0jzgdaalq1d1fc6c58xh4k1pbmvn8v5j-golangci-lint-1.56.2"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/cvq0087d1qc5vn0x691zmifdrqxmwyg0-golangci-lint-1.56.2"
+        }
+      }
+    }
+  }
+}

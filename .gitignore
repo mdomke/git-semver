@@ -14,4 +14,4 @@
 /git-semver
 /coverage.txt
 
-dist/
+.devbox/
