@@ -203,7 +203,7 @@ func TestInvalidFormat(t *testing.T) {
 func TestTargetReleaseToString(t *testing.T) {
 	assert.PanicsWithError(t, "unexpected TargetRevision value 8", func() {
 		v := TargetRelease(8)
-		v.String()
+		_ = v.String()
 	})
 
 	{
