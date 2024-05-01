@@ -111,7 +111,7 @@ The output and parsing of `git-semver` can be controlled with the following opti
 | `-prefix`             | Prefix string for version e.g.: v                                  |
 | `-set-meta`           | Set buildmeta to this value                                        |
 | `-guard`              | Ignore shorthand formats for pre-release versions                  |
-| `-target-release`     | Bump `patch` (default), `minor` or `major` of pre-release versions |
+| `-bump-to-next`       | Bump `patch` (default), `minor` or `major` of pre-release versions |
 
 
 #### Examples
@@ -134,10 +134,10 @@ v3.5.2
 $ git-semver -set-meta custom
 3.5.2+custom
 
-$ git-semver -target-release minor
+$ git-semver -bump-to-next minor
 3.6.0-dev.22+8eaec5d3
 
-$ git-semver -target-release major
+$ git-semver -bump-to-next major
 4.0.0-dev.22+8eaec5d3
 ```
 

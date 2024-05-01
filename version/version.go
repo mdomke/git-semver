@@ -21,42 +21,42 @@ const (
 )
 
 // Enum that specifies which version component should be bumped
-type TargetRelease int
+type VersionComp int
 
 const (
-	TargetPatch TargetRelease = iota
-	TargetMinor
-	TargetMajor
+	Patch VersionComp = iota
+	Minor
+	Major
 )
 
-func (t *TargetRelease) String() string {
+func (t *VersionComp) String() string {
 	switch *t {
-	case TargetPatch:
+	case Patch:
 		return "patch"
-	case TargetMinor:
+	case Minor:
 		return "minor"
-	case TargetMajor:
+	case Major:
 		return "major"
 	default:
 		panic(fmt.Errorf("unexpected TargetRevision value %v", *t))
 	}
 }
 
-func (t *TargetRelease) Set(value string) error {
+func (t *VersionComp) Set(value string) error {
 	switch value {
 	case "patch":
-		*t = TargetPatch
+		*t = Patch
 	case "minor":
-		*t = TargetMinor
+		*t = Minor
 	case "major":
-		*t = TargetMajor
+		*t = Major
 	default:
 		return errors.New(`parse error`)
 	}
 	return nil
 }
 
-const DefaultTargetRelease = TargetPatch
+const DefaultVersionComp = Patch
 
 type buffer []byte
 
@@ -91,7 +91,7 @@ type Version struct {
 // * m -> metadata
 // x, y and z are separated by a dot. p is seprated by a hyphen and m by a plus sing.
 // E.g.: x.y.z-p+m or x.y
-func (v Version) Format(format string, target TargetRelease) (string, error) {
+func (v Version) Format(format string, target VersionComp) (string, error) {
 	re := regexp.MustCompile(
 		`(?P<major>x)(?P<minor>\.y)?(?P<patch>\.z)?(?P<pre>-p)?(?P<meta>\+m)?`)
 
@@ -100,22 +100,23 @@ func (v Version) Format(format string, target TargetRelease) (string, error) {
 		return "", fmt.Errorf("invalid format: %s", format)
 	}
 
-	var buf buffer
-
-	major := v.Major
-	minor := v.Minor
-	patch := v.Patch
+	var (
+		buf   buffer
+		major = v.Major
+		minor = v.Minor
+		patch = v.Patch
+	)
 
 	if v.Commits > 0 && v.preRelease == "" {
 		switch target {
-		case TargetMajor:
+		case Major:
 			major++
 			minor = 0
 			patch = 0
-		case TargetMinor:
+		case Minor:
 			minor++
 			patch = 0
-		case TargetPatch:
+		case Patch:
 			patch++
 		}
 	}
@@ -143,7 +144,7 @@ func (v Version) Format(format string, target TargetRelease) (string, error) {
 }
 
 func (v Version) String() string {
-	result, err := v.Format(FullFormat, DefaultTargetRelease)
+	result, err := v.Format(FullFormat, DefaultVersionComp)
 	if err != nil {
 		return ""
 	}

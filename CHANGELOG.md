@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ## [6.9.0] - tbd
 ### Added
-* New flag `-target-revision` that can be used to select which version component will be bumped
+* New flag `-bump-to-next` that can be used to select which version component will be bumped
   if version contains pre-release. Possible values are `patch` (default), `minor` and `major`.
 * Added [devbox](https://www.jetpack.io/devbox/) configuration
 

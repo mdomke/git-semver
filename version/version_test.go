@@ -129,61 +129,61 @@ func TestFormat(t *testing.T) {
 		f string
 		p string
 		s string
-		t TargetRelease
+		t VersionComp
 	}{
 		{
 			FullFormat,
 			"",
 			"1.2.4-dev.10+fcf2c8f",
-			DefaultTargetRelease,
+			DefaultVersionComp,
 		},
 		{
 			NoMetaFormat,
 			"",
 			"1.2.4-dev.10",
-			DefaultTargetRelease,
+			DefaultVersionComp,
 		},
 		{
 			NoPreFormat,
 			"",
 			"1.2.4",
-			DefaultTargetRelease,
+			DefaultVersionComp,
 		},
 		{
 			NoPatchFormat,
 			"",
 			"1.2",
-			DefaultTargetRelease,
+			DefaultVersionComp,
 		},
 		{
 			NoMinorFormat,
 			"v",
 			"v1",
-			DefaultTargetRelease,
+			DefaultVersionComp,
 		},
 		{
 			"x.y-p",
 			"v",
 			"v1.2-dev.10",
-			DefaultTargetRelease,
+			DefaultVersionComp,
 		},
 		{
 			FullFormat,
 			"",
 			"1.2.4-dev.10+fcf2c8f",
-			TargetPatch,
+			Patch,
 		},
 		{
 			FullFormat,
 			"",
 			"1.3.0-dev.10+fcf2c8f",
-			TargetMinor,
+			Minor,
 		},
 		{
 			FullFormat,
 			"",
 			"2.0.0-dev.10+fcf2c8f",
-			TargetMajor,
+			Major,
 		},
 	} {
 		v.Prefix = test.p
@@ -195,54 +195,54 @@ func TestFormat(t *testing.T) {
 
 func TestInvalidFormat(t *testing.T) {
 	v := Version{Major: 1, Minor: 2, Patch: 3}
-	s, err := v.Format("q", DefaultTargetRelease)
+	s, err := v.Format("q", DefaultVersionComp)
 	assert.EqualError(t, err, "invalid format: q")
 	assert.Equal(t, "", s)
 }
 
-func TestTargetReleaseToString(t *testing.T) {
+func TestVersionCompToString(t *testing.T) {
 	assert.PanicsWithError(t, "unexpected TargetRevision value 8", func() {
-		v := TargetRelease(8)
+		v := VersionComp(8)
 		_ = v.String()
 	})
 
 	{
-		v := TargetPatch
+		v := Patch
 		assert.Equal(t, "patch", v.String())
 	}
 
 	{
-		v := TargetMinor
+		v := Minor
 		assert.Equal(t, "minor", v.String())
 	}
 
 	{
-		v := TargetMajor
+		v := Major
 		assert.Equal(t, "major", v.String())
 	}
 }
 
-func TestTargetReleaseFromString(t *testing.T) {
+func TestVersionCompFromString(t *testing.T) {
 	{
-		var v TargetRelease
+		var v VersionComp
 		assert.EqualError(t, v.Set("foo"), "parse error")
 	}
 
 	{
-		var v TargetRelease
+		var v VersionComp
 		assert.NoError(t, v.Set("patch"))
-		assert.Equal(t, TargetPatch, v)
+		assert.Equal(t, Patch, v)
 	}
 
 	{
-		var v TargetRelease
+		var v VersionComp
 		assert.NoError(t, v.Set("minor"))
-		assert.Equal(t, TargetMinor, v)
+		assert.Equal(t, Minor, v)
 	}
 
 	{
-		var v TargetRelease
+		var v VersionComp
 		assert.NoError(t, v.Set("major"))
-		assert.Equal(t, TargetMajor, v)
+		assert.Equal(t, Major, v)
 	}
 }
