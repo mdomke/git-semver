@@ -5,8 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Added
 ## [6.9.0] - tbd
 ### Added
+* New flag `-bump-to-next` that can be used to select which version component will be bumped
+  if version contains pre-release. Possible values are `patch` (default), `minor` and `major`.
 * Added [devbox](https://www.jetpack.io/devbox/) configuration
 
 ### Changed

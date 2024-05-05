@@ -129,40 +129,65 @@ func TestFormat(t *testing.T) {
 		f string
 		p string
 		s string
+		t VersionComp
 	}{
 		{
 			FullFormat,
 			"",
 			"1.2.4-dev.10+fcf2c8f",
+			DefaultVersionComp,
 		},
 		{
 			NoMetaFormat,
 			"",
 			"1.2.4-dev.10",
+			DefaultVersionComp,
 		},
 		{
 			NoPreFormat,
 			"",
 			"1.2.4",
+			DefaultVersionComp,
 		},
 		{
 			NoPatchFormat,
 			"",
 			"1.2",
+			DefaultVersionComp,
 		},
 		{
 			NoMinorFormat,
 			"v",
 			"v1",
+			DefaultVersionComp,
 		},
 		{
 			"x.y-p",
 			"v",
 			"v1.2-dev.10",
+			DefaultVersionComp,
+		},
+		{
+			FullFormat,
+			"",
+			"1.2.4-dev.10+fcf2c8f",
+			Patch,
+		},
+		{
+			FullFormat,
+			"",
+			"1.3.0-dev.10+fcf2c8f",
+			Minor,
+		},
+		{
+			FullFormat,
+			"",
+			"2.0.0-dev.10+fcf2c8f",
+			Major,
 		},
 	} {
 		v.Prefix = test.p
-		s, err := v.Format(test.f)
+		s, err := v.Format(test.f, test.t)
 		assert.NoError(err)
 		assert.Equal(test.s, s)
 	}
@@ -170,7 +195,54 @@ func TestFormat(t *testing.T) {
 
 func TestInvalidFormat(t *testing.T) {
 	v := Version{Major: 1, Minor: 2, Patch: 3}
-	s, err := v.Format("q")
+	s, err := v.Format("q", DefaultVersionComp)
 	assert.EqualError(t, err, "invalid format: q")
 	assert.Equal(t, "", s)
+}
+
+func TestVersionCompToString(t *testing.T) {
+	assert.PanicsWithError(t, "unexpected TargetRevision value 8", func() {
+		v := VersionComp(8)
+		_ = v.String()
+	})
+
+	{
+		v := Patch
+		assert.Equal(t, "patch", v.String())
+	}
+
+	{
+		v := Minor
+		assert.Equal(t, "minor", v.String())
+	}
+
+	{
+		v := Major
+		assert.Equal(t, "major", v.String())
+	}
+}
+
+func TestVersionCompFromString(t *testing.T) {
+	{
+		var v VersionComp
+		assert.EqualError(t, v.Set("foo"), "parse error")
+	}
+
+	{
+		var v VersionComp
+		assert.NoError(t, v.Set("patch"))
+		assert.Equal(t, Patch, v)
+	}
+
+	{
+		var v VersionComp
+		assert.NoError(t, v.Set("minor"))
+		assert.Equal(t, Minor, v)
+	}
+
+	{
+		var v VersionComp
+		assert.NoError(t, v.Set("major"))
+		assert.Equal(t, Major, v)
+	}
 }

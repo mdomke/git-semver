@@ -23,6 +23,7 @@ type Config struct {
 	excludeMinor      bool
 	guardRelease      bool
 	matchPattern      string
+	versionComp       version.VersionComp
 	args              []string
 	stderr            io.Writer
 	stdout            io.Writer
@@ -33,6 +34,8 @@ func parseFlags(progname string, args []string) (*Config, string, error) {
 		buf bytes.Buffer
 		cfg Config
 	)
+
+	cfg.versionComp = version.DefaultVersionComp
 
 	flags := flag.NewFlagSet(progname, flag.ContinueOnError)
 	flags.SetOutput(&buf)
@@ -47,6 +50,7 @@ func parseFlags(progname string, args []string) (*Config, string, error) {
 	flags.BoolVar(&cfg.excludeMinor, "no-minor", false, "exclude pre-release version (default: false)")
 	flags.BoolVar(&cfg.excludePrefix, "no-prefix", false, "exclude version prefix (default: false)")
 	flags.BoolVar(&cfg.guardRelease, "guard", false, "ignore shorthand options if version contains pre-release (default: false)")
+	flags.Var(&cfg.versionComp, "bump-to-next", "set which version component (major, minor or patch) will be bumped if version contains pre-release (default: patch)")
 	flags.Usage = func() {
 		fmt.Fprintf(flags.Output(), "Usage: %s [opts] [<repo>]\n\nOptions:\n", progname)
 		flags.PrintDefaults()
@@ -56,6 +60,7 @@ func parseFlags(progname string, args []string) (*Config, string, error) {
 	if err != nil {
 		return nil, buf.String(), err
 	}
+
 	cfg.args = flags.Args()
 	cfg.stderr = os.Stderr
 	cfg.stdout = os.Stdout
@@ -112,7 +117,7 @@ func handle(cfg *Config, repoPath string) int {
 	if cfg.excludePrefix {
 		v.Prefix = ""
 	}
-	s, err := v.Format(selectFormat(cfg, v))
+	s, err := v.Format(selectFormat(cfg, v), cfg.versionComp)
 	if err != nil {
 		fmt.Fprintln(cfg.stderr, err)
 		return 1

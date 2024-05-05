@@ -101,16 +101,17 @@ plus character. A valid format string is e.g.: `x.y+m`
 
 The output and parsing of `git-semver` can be controlled with the following options.
 
-| Name                  | Description                                              |
-| ---                   | ---                                                      |
-| `-format`             | Format string as described [here](#formatting)           |
-| `-no-minor`           | Exclude minor version and all following components       |
-| `-no-patch`           | Exclude patch version and all following components       |
-| `-no-pre`             | Exclude pre-release version and all following components |
-| `-no-meta`/`-no-hash` | Exclude build metadata                                   |
-| `-prefix`             | Prefix string for version e.g.: v                        |
-| `-set-meta`           | Set buildmeta to this value                              |
-| `-guard`              | Ignore shorthand formats for pre-release versions        |
+| Name                  | Description                                                        |
+| ---                   | ---                                                                |
+| `-format`             | Format string as described [here](#formatting)                     |
+| `-no-minor`           | Exclude minor version and all following components                 |
+| `-no-patch`           | Exclude patch version and all following components                 |
+| `-no-pre`             | Exclude pre-release version and all following components           |
+| `-no-meta`/`-no-hash` | Exclude build metadata                                             |
+| `-prefix`             | Prefix string for version e.g.: v                                  |
+| `-set-meta`           | Set buildmeta to this value                                        |
+| `-guard`              | Ignore shorthand formats for pre-release versions                  |
+| `-bump-to-next`       | Bump `patch` (default), `minor` or `major` of pre-release versions |
 
 
 #### Examples
@@ -132,6 +133,12 @@ v3.5.2
 
 $ git-semver -set-meta custom
 3.5.2+custom
+
+$ git-semver -bump-to-next minor
+3.6.0-dev.22+8eaec5d3
+
+$ git-semver -bump-to-next major
+4.0.0-dev.22+8eaec5d3
 ```
 
 ### Release safeguard
