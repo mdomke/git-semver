@@ -1,10 +1,25 @@
-[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/mdomke/git-semver/lint-and-test.yaml?branch=master)](https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test)
-[![Codecov](https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg)](https://codecov.io/gh/mdomke/git-semver)
-![License](https://img.shields.io/github/license/mdomke/git-semver.svg)
-![Tag](https://img.shields.io/github/tag/mdomke/git-semver.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mdomke/git-semver)](https://goreportcard.com/report/github.com/mdomke/git-semver)
+<p align="center">
+   <a href="https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test"><img src="https://img.shields.io/github/actions/workflow/status/mdomke/git-semver/lint-and-test.yaml?branch=master" /></a>
+   <a href="https://codecov.io/gh/mdomke/git-semver"><img src="https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg" /></a>
+   <a href="LICENSE"><img src="https://img.shields.io/github/license/mdomke/git-semver.svg" /></a>
+   <img src="https://img.shields.io/github/tag/mdomke/git-semver.svg" />
+   <a href="https://goreportcard.com/report/github.com/mdomke/git-semver"><img src="https://goreportcard.com/badge/github.com/mdomke/git-semver" /></a>
+</p>
 
-# Semantic Versioning with git tags
+# `git-semver`: Semantic Versioning with git tags 
+
+## What is this used for?
+
+* CI/CD pipeline: Continuously version your artifacts and uniquely identify your dev-builds.
+   ```console
+   $ APP_VERSION=$(git-semver)
+   ```
+* Tag releases: Automate your workflow for tagging releases of your software.
+   ```console
+   $ git tag $(git-semver -target minor)
+   ```
+
+## Background 
 
 Software should be versioned in order to be able to identify a certain
 feature set or to know when a specific bug has been fixed. It is a good
@@ -35,7 +50,7 @@ to attach a pre-release identifier to a version e.g. for a release candidate. Th
 identifier is separated with hyphen from the core version component. A valid version
 tag would be, e.g. `1.2.3`, `v2.3.0`, `1.1.0-rc3`.
 
-```sh
+```console
 $ git tag v2.0.0-rc1
 ```
 
@@ -43,7 +58,7 @@ So for a tagged commit we would know which version to assign to our software, bu
 which version should we use for not tagged commits? We can use `git describe` to
 get a unique identifier based on the last tagged commit.
 
-```sh
+```console
 $ git describe --tags
 3.5.1-22-gbaf822dd5
 ```
@@ -52,7 +67,7 @@ This is the 22nd commit after the tag `3.5.1` with the abbreviated commit hash `
 Sadly this identifier has two drawbacks.
 
 1. It's not compliant to SemVer, because there are multiple hyphens after the core version.
-   See the [BNF specifiction](https://github.com/semver/semver/blob/master/semver.md#backusnaur-form-grammar-for-valid-semver-versions)
+   See the [BNF specification](https://github.com/semver/semver/blob/master/semver.md#backusnaur-form-grammar-for-valid-semver-versions)
 
 2. It doesn't allow proper sorting of versions, because the pre-release identifier would
    make the version smaller than the tagged version, even though it has several commits build
@@ -111,12 +126,12 @@ The output and parsing of `git-semver` can be controlled with the following opti
 | `-prefix`             | Prefix string for version e.g.: v                                  |
 | `-set-meta`           | Set buildmeta to this value                                        |
 | `-guard`              | Ignore shorthand formats for pre-release versions                  |
-| `-bump-to-next`       | Bump `patch` (default), `minor` or `major` of pre-release versions |
+| `-target`             | Set target release `dev`(default), `patch`, `minor` or `major`     |
 
 
 #### Examples
 
-```sh
+```console
 $ git-semver
 3.5.2-dev.22+8eaec5d3
 
@@ -134,21 +149,25 @@ v3.5.2
 $ git-semver -set-meta custom
 3.5.2+custom
 
-$ git-semver -bump-to-next minor
-3.6.0-dev.22+8eaec5d3
+$ git-semver -target minor
+3.6.0
 
-$ git-semver -bump-to-next major
-4.0.0-dev.22+8eaec5d3
+$ git-semver -target major
+4.0.0
 ```
+
+### Bumping versions
+
+A common application of `git-semver` is to create new 
 
 ### Release safeguard
 
-If you use `git-semver` to automatically derive versions for your application and you
-want to provide convenient shorthand versions (e.g. `1.2`), so that it is easier to follow
-non-breaking updates, you might run into the problem that a pre-release version accidentally 
-overwrites a production version. This is because
+If you use `git-semver` to automatically derive versions for your application (e.g. in a CI/CD
+environment), and you want to provide convenient shorthand versions (e.g. `1.2`), so that it is
+easier to follow non-breaking updates, you might run into the problem that a pre-release version
+accidentally  overwrites a production version. This is because
 
-```sh
+```console
 # tag of HEAD commit: 1.2.2
 $ git-semver -no-patch
 1.2
@@ -162,7 +181,7 @@ result in the same shorthand version. To mitigate this problem you can use the `
 that will ignore any output format that doesn't contain the pre-release identifier if the current
 version is a pre-release version. E.g.
 
-```sh
+```console
 # tag of HEAD commit: 1.2.3-dev.1"
 $ git-semver -guard -no-patch
 1.2.3-dev.1+8eaec5d3
@@ -174,7 +193,7 @@ If you create multiple annotated tags on the same commit (e.g. you want to promo
 to be the final release without adding any further commits), `git-semver` will pick the tag that was
 created last, which is usually what you want. E.g.
 
-```sh
+```console
 $ git tag -a -m "Release candidate" 1.1.0-rc.1 
 $ git-semver
 1.1.0-rc.1
@@ -185,15 +204,15 @@ $ git-semver
 
 ## Installation
 
-Currently `git-semver` can be installed with `go install`
+Currently, `git-semver` can be installed with `go install`
 
-```sh
+```console
 $ go install github.com/mdomke/git-semver/v6@latest
 ```
 
 There is also a [Homebrew](https://brew.sh/) formula that can be installed with
 
-```sh
+```console
 $ brew install mdomke/git-semver/git-semver
 ```
 
@@ -202,12 +221,12 @@ $ brew install mdomke/git-semver/git-semver
 You can also use `git-semver` as a docker-container. Images are available from [DockerHub][1] and
 [GitHub Container Registry][2]
 
-```sh
-docker run --rm -v `pwd`:/git-semver mdomke/git-semver
+```console
+$ docker run --rm -v `pwd`:/git-semver mdomke/git-semver
 ```
 or
-```sh
-docker run --rm -v `pwd`:/git-semver ghcr.io/mdomke/git-semver
+```console
+$ docker run --rm -v `pwd`:/git-semver ghcr.io/mdomke/git-semver
 ```
 
 [1]: https://hub.docker.com/r/mdomke/git-semver

@@ -20,17 +20,21 @@ const (
 	NoMinorFormat = "x"
 )
 
-// Enum that specifies which version component should be bumped
-type VersionComp int
+type Target int
 
 const (
-	Patch VersionComp = iota
+	Devel Target = iota
+	Patch
 	Minor
 	Major
 )
 
-func (t *VersionComp) String() string {
+const DefaultTarget = Devel
+
+func (t *Target) String() string {
 	switch *t {
+	case Devel:
+		return "dev"
 	case Patch:
 		return "patch"
 	case Minor:
@@ -38,12 +42,14 @@ func (t *VersionComp) String() string {
 	case Major:
 		return "major"
 	default:
-		panic(fmt.Errorf("unexpected TargetRevision value %v", *t))
+		panic(fmt.Errorf("unexpected target component %v", *t))
 	}
 }
 
-func (t *VersionComp) Set(value string) error {
+func (t *Target) Set(value string) error {
 	switch value {
+	case "dev":
+		*t = Devel
 	case "patch":
 		*t = Patch
 	case "minor":
@@ -55,8 +61,6 @@ func (t *VersionComp) Set(value string) error {
 	}
 	return nil
 }
-
-const DefaultVersionComp = Patch
 
 type buffer []byte
 
@@ -82,6 +86,33 @@ type Version struct {
 	Meta       string
 }
 
+func (v Version) BumpTo(r Target) Version {
+	resetSuffix := func() {
+		v.Commits = 0
+		v.preRelease = ""
+		v.Meta = ""
+	}
+	switch r {
+	case Devel:
+		if v.Commits > 0 && v.preRelease == "" {
+			v.Patch++
+		}
+	case Patch:
+		resetSuffix()
+		v.Patch++
+	case Minor:
+		resetSuffix()
+		v.Patch = 0
+		v.Minor++
+	case Major:
+		resetSuffix()
+		v.Patch = 0
+		v.Minor = 0
+		v.Major++
+	}
+	return v
+}
+
 // Format returns a string representation of the version including the parts
 // defined in the format string. The format can have the following components:
 // * x -> major version
@@ -89,9 +120,9 @@ type Version struct {
 // * z -> patch version
 // * p -> pre-release
 // * m -> metadata
-// x, y and z are separated by a dot. p is seprated by a hyphen and m by a plus sing.
+// x, y and z are separated by a dot. p is seprated by a hyphen and m by a plus sign.
 // E.g.: x.y.z-p+m or x.y
-func (v Version) Format(format string, target VersionComp) (string, error) {
+func (v Version) Format(format string) (string, error) {
 	re := regexp.MustCompile(
 		`(?P<major>x)(?P<minor>\.y)?(?P<patch>\.z)?(?P<pre>-p)?(?P<meta>\+m)?`)
 
@@ -102,49 +133,30 @@ func (v Version) Format(format string, target VersionComp) (string, error) {
 
 	var (
 		buf   buffer
-		major = v.Major
-		minor = v.Minor
-		patch = v.Patch
+		names = re.SubexpNames()
 	)
-
-	if v.Commits > 0 && v.preRelease == "" {
-		switch target {
-		case Major:
-			major++
-			minor = 0
-			patch = 0
-		case Minor:
-			minor++
-			patch = 0
-		case Patch:
-			patch++
-		}
-	}
-
-	names := re.SubexpNames()
 	for i := 0; i < len(matches); i++ {
 		if len(matches[i]) == 0 {
 			continue
 		}
 		switch names[i] {
 		case "major":
-			buf.AppendInt(major, '.')
+			buf.AppendInt(v.Major, '.')
 		case "minor":
-			buf.AppendInt(minor, '.')
+			buf.AppendInt(v.Minor, '.')
 		case "patch":
-			buf.AppendInt(patch, '.')
+			buf.AppendInt(v.Patch, '.')
 		case "pre":
 			buf.AppendString(v.PreRelease(), '-')
 		case "meta":
 			buf.AppendString(v.Meta, '+')
 		}
 	}
-
 	return v.Prefix + string(buf), nil
 }
 
 func (v Version) String() string {
-	result, err := v.Format(FullFormat, DefaultVersionComp)
+	result, err := v.Format(FullFormat)
 	if err != nil {
 		return ""
 	}

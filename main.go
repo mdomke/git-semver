@@ -23,7 +23,7 @@ type Config struct {
 	excludeMinor      bool
 	guardRelease      bool
 	matchPattern      string
-	versionComp       version.VersionComp
+	releaseTarget     version.Target
 	args              []string
 	stderr            io.Writer
 	stdout            io.Writer
@@ -35,7 +35,7 @@ func parseFlags(progname string, args []string) (*Config, string, error) {
 		cfg Config
 	)
 
-	cfg.versionComp = version.DefaultVersionComp
+	cfg.releaseTarget = version.DefaultTarget
 
 	flags := flag.NewFlagSet(progname, flag.ContinueOnError)
 	flags.SetOutput(&buf)
@@ -49,8 +49,17 @@ func parseFlags(progname string, args []string) (*Config, string, error) {
 	flags.BoolVar(&cfg.excludePatch, "no-patch", false, "exclude patch version (default: false)")
 	flags.BoolVar(&cfg.excludeMinor, "no-minor", false, "exclude pre-release version (default: false)")
 	flags.BoolVar(&cfg.excludePrefix, "no-prefix", false, "exclude version prefix (default: false)")
-	flags.BoolVar(&cfg.guardRelease, "guard", false, "ignore shorthand options if version contains pre-release (default: false)")
-	flags.Var(&cfg.versionComp, "bump-to-next", "set which version component (major, minor or patch) will be bumped if version contains pre-release (default: patch)")
+	flags.BoolVar(
+		&cfg.guardRelease,
+		"guard",
+		false,
+		"ignore shorthand options if version contains pre-release (default: false)",
+	)
+	flags.Var(
+		&cfg.releaseTarget,
+		"target",
+		"set release target (major, minor, patch or dev) to bump version to (default: dev)",
+	)
 	flags.Usage = func() {
 		fmt.Fprintf(flags.Output(), "Usage: %s [opts] [<repo>]\n\nOptions:\n", progname)
 		flags.PrintDefaults()
@@ -108,6 +117,7 @@ func handle(cfg *Config, repoPath string) int {
 		fmt.Fprintln(cfg.stderr, err)
 		return 1
 	}
+	v = v.BumpTo(cfg.releaseTarget)
 	if cfg.setMeta != "" {
 		v.Meta = cfg.setMeta
 	}
@@ -117,7 +127,7 @@ func handle(cfg *Config, repoPath string) int {
 	if cfg.excludePrefix {
 		v.Prefix = ""
 	}
-	s, err := v.Format(selectFormat(cfg, v), cfg.versionComp)
+	s, err := v.Format(selectFormat(cfg, v))
 	if err != nil {
 		fmt.Fprintln(cfg.stderr, err)
 		return 1

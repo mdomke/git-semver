@@ -8,8 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ## [6.9.0] - tbd
 ### Added
-* New flag `-bump-to-next` that can be used to select which version component will be bumped
-  if version contains pre-release. Possible values are `patch` (default), `minor` and `major`.
+* New flag `-target` that can be used to select to which component the version will be bumped to.
+  Possible values are `dev` (default), `patch`, `minor` and `major`. E.g.
+
+        $ git describe
+        v6.8.1-16-gcf8b124
+        $ git-semver -target minor
+        v6.9.0
+        
 * Added [devbox](https://www.jetpack.io/devbox/) configuration
 
 ### Changed

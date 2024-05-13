@@ -98,7 +98,7 @@ func TestString(t *testing.T) {
 	}{
 		{
 			Version{Major: 1, Minor: 2, Patch: 3, Commits: 10, Meta: "fcf2c8f"},
-			"1.2.4-dev.10+fcf2c8f",
+			"1.2.3-dev.10+fcf2c8f",
 		},
 		{
 			Version{Major: 0, Minor: 3, Patch: 1},
@@ -129,65 +129,45 @@ func TestFormat(t *testing.T) {
 		f string
 		p string
 		s string
-		t VersionComp
 	}{
 		{
 			FullFormat,
 			"",
-			"1.2.4-dev.10+fcf2c8f",
-			DefaultVersionComp,
+			"1.2.3-dev.10+fcf2c8f",
 		},
 		{
 			NoMetaFormat,
 			"",
-			"1.2.4-dev.10",
-			DefaultVersionComp,
+			"1.2.3-dev.10",
 		},
 		{
 			NoPreFormat,
 			"",
-			"1.2.4",
-			DefaultVersionComp,
+			"1.2.3",
 		},
 		{
 			NoPatchFormat,
 			"",
 			"1.2",
-			DefaultVersionComp,
 		},
 		{
 			NoMinorFormat,
 			"v",
 			"v1",
-			DefaultVersionComp,
 		},
 		{
 			"x.y-p",
 			"v",
 			"v1.2-dev.10",
-			DefaultVersionComp,
 		},
 		{
 			FullFormat,
 			"",
-			"1.2.4-dev.10+fcf2c8f",
-			Patch,
-		},
-		{
-			FullFormat,
-			"",
-			"1.3.0-dev.10+fcf2c8f",
-			Minor,
-		},
-		{
-			FullFormat,
-			"",
-			"2.0.0-dev.10+fcf2c8f",
-			Major,
+			"1.2.3-dev.10+fcf2c8f",
 		},
 	} {
 		v.Prefix = test.p
-		s, err := v.Format(test.f, test.t)
+		s, err := v.Format(test.f)
 		assert.NoError(err)
 		assert.Equal(test.s, s)
 	}
@@ -195,54 +175,43 @@ func TestFormat(t *testing.T) {
 
 func TestInvalidFormat(t *testing.T) {
 	v := Version{Major: 1, Minor: 2, Patch: 3}
-	s, err := v.Format("q", DefaultVersionComp)
+	s, err := v.Format("q")
 	assert.EqualError(t, err, "invalid format: q")
 	assert.Equal(t, "", s)
 }
 
-func TestVersionCompToString(t *testing.T) {
-	assert.PanicsWithError(t, "unexpected TargetRevision value 8", func() {
-		v := VersionComp(8)
+func TestReleaseToString(t *testing.T) {
+	assert.PanicsWithError(t, "unexpected target component 8", func() {
+		v := Target(8)
 		_ = v.String()
 	})
 
-	{
-		v := Patch
-		assert.Equal(t, "patch", v.String())
-	}
+	v := Devel
+	assert.Equal(t, "dev", v.String())
 
-	{
-		v := Minor
-		assert.Equal(t, "minor", v.String())
-	}
+	v = Patch
+	assert.Equal(t, "patch", v.String())
 
-	{
-		v := Major
-		assert.Equal(t, "major", v.String())
-	}
+	v = Minor
+	assert.Equal(t, "minor", v.String())
+
+	v = Major
+	assert.Equal(t, "major", v.String())
 }
 
-func TestVersionCompFromString(t *testing.T) {
-	{
-		var v VersionComp
-		assert.EqualError(t, v.Set("foo"), "parse error")
-	}
+func TestParseRelease(t *testing.T) {
+	var v Target
+	assert.EqualError(t, v.Set("foo"), "parse error")
 
-	{
-		var v VersionComp
-		assert.NoError(t, v.Set("patch"))
-		assert.Equal(t, Patch, v)
-	}
+	assert.NoError(t, v.Set("dev"))
+	assert.Equal(t, Devel, v)
 
-	{
-		var v VersionComp
-		assert.NoError(t, v.Set("minor"))
-		assert.Equal(t, Minor, v)
-	}
+	assert.NoError(t, v.Set("patch"))
+	assert.Equal(t, Patch, v)
 
-	{
-		var v VersionComp
-		assert.NoError(t, v.Set("major"))
-		assert.Equal(t, Major, v)
-	}
+	assert.NoError(t, v.Set("minor"))
+	assert.Equal(t, Minor, v)
+
+	assert.NoError(t, v.Set("major"))
+	assert.Equal(t, Major, v)
 }

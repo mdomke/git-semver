@@ -55,6 +55,10 @@ func TestParseFlags(t *testing.T) {
 			cfg:  &Config{setMeta: "finleap", args: []string{}},
 		},
 		{
+			args: []string{"-target", "minor"},
+			cfg:  &Config{releaseTarget: version.Minor, args: []string{}},
+		},
+		{
 			args:     []string{"-help"},
 			hasError: true,
 		},
