@@ -80,11 +80,12 @@ func selectFormat(cfg *Config, v version.Version) string {
 	var format string
 	switch {
 	case cfg.guardRelease && v.PreRelease() != "":
-		if strings.Contains(cfg.format, version.NoMetaFormat) {
+		switch {
+		case strings.Contains(cfg.format, version.NoMetaFormat):
 			format = cfg.format
-		} else if cfg.excludeHash || cfg.excludeMeta {
+		case cfg.excludeHash || cfg.excludeMeta:
 			format = version.NoMetaFormat
-		} else {
+		default:
 			format = version.FullFormat
 		}
 	case cfg.format != "":
@@ -112,22 +113,22 @@ func handle(cfg *Config, repoPath string) int {
 			return 1
 		}
 	}
-	v, err := version.NewFromRepo(repoPath, cfg.prefix, cfg.matchPattern)
+	ver, err := version.NewFromRepo(repoPath, cfg.prefix, cfg.matchPattern)
 	if err != nil {
 		fmt.Fprintln(cfg.stderr, err)
 		return 1
 	}
-	v = v.BumpTo(cfg.releaseTarget)
+	ver = ver.BumpTo(cfg.releaseTarget)
 	if cfg.setMeta != "" {
-		v.Meta = cfg.setMeta
+		ver.Meta = cfg.setMeta
 	}
 	if cfg.prefix != "" {
-		v.Prefix = cfg.prefix
+		ver.Prefix = cfg.prefix
 	}
 	if cfg.excludePrefix {
-		v.Prefix = ""
+		ver.Prefix = ""
 	}
-	s, err := v.Format(selectFormat(cfg, v))
+	s, err := ver.Format(selectFormat(cfg, ver))
 	if err != nil {
 		fmt.Fprintln(cfg.stderr, err)
 		return 1

@@ -1,9 +1,9 @@
 <p align="center">
-   <a href="https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test"><img src="https://img.shields.io/github/actions/workflow/status/mdomke/git-semver/lint-and-test.yaml?branch=master" /></a>
-   <a href="https://codecov.io/gh/mdomke/git-semver"><img src="https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg" /></a>
-   <a href="LICENSE"><img src="https://img.shields.io/github/license/mdomke/git-semver.svg" /></a>
-   <img src="https://img.shields.io/github/tag/mdomke/git-semver.svg" />
-   <a href="https://goreportcard.com/report/github.com/mdomke/git-semver"><img src="https://goreportcard.com/badge/github.com/mdomke/git-semver" /></a>
+   <a href="https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test"><img src="https://img.shields.io/github/actions/workflow/status/mdomke/git-semver/lint-and-test.yaml?branch=master?style=flat-square" /></a>
+   <a href="https://codecov.io/gh/mdomke/git-semver"><img src="https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg?style=flat-square" /></a>
+   <a href="LICENSE"><img src="https://img.shields.io/github/license/mdomke/git-semver.svg?style=flat-square" /></a>
+   <img src="https://img.shields.io/github/tag/mdomke/git-semver.svg?style=flat-square" />
+   <a href="https://goreportcard.com/report/github.com/mdomke/git-semver"><img src="https://goreportcard.com/badge/github.com/mdomke/git-semver?style=flat-square" /></a>
 </p>
 
 # `git-semver`: Semantic Versioning with git tags 
@@ -11,29 +11,36 @@
 ## What is this used for?
 
 * CI/CD pipeline: Continuously version your artifacts and uniquely identify your dev-builds.
+  `git-semver` will generate unique SemVer compliant versions for each commit you add to your
+  project. Let's say you were using `APP_VERSION` in your build-pipeline you could simply replace
+  it with
    ```console
    $ APP_VERSION=$(git-semver)
    ```
-* Tag releases: Automate your workflow for tagging releases of your software.
+* Tag releases: Automate your workflow for tagging releases of your software. Automatically select
+  the next patch/minor/major version when creating a new release tag:
    ```console
    $ git tag $(git-semver -target minor)
    ```
+  or create an alias
+   ```console
+   alias tag-minor="git-semver -target minor"  
+   ```
 
-## Background 
+## Why is this useful?
 
-Software should be versioned in order to be able to identify a certain
-feature set or to know when a specific bug has been fixed. It is a good
-practice to use [Semantic Versioning](https://semver.org/) (SemVer) in
-order to attach a meaning to a version number or the change thereof.
+Software should be versioned in order to be able to identify a certain feature set or to know when
+a specific bug has been fixed. It is a good practice to use [Semantic Versioning](https://semver.org/)
+(SemVer) in order to attach a meaning to a version number or the change thereof.
 
-[git](https://git-scm.com/) allows you to conveniently reference a certain
-state of your code through the usage of tags. Tags can have an arbitrary
-identifier, so that it seems a natural choice to use them for versioning.
+[git](https://git-scm.com/) allows you to conveniently reference a certain state of your code
+through the usage of tags. Tags can have an arbitrary identifier, so that it seems a natural choice
+to use them for versioning.
 
 ---
 
 * [Version tags](#version-tags)
-* [Usage](#git-semver)
+* [Usage](#usage)
    * [Formatting](#formatting)
    * [Command line options](#command-line-options)
    * [Release safeguard](#release-safeguard)
@@ -73,7 +80,7 @@ Sadly this identifier has two drawbacks.
    make the version smaller than the tagged version, even though it has several commits build
    on top of that version.
 
-## git-semver
+## Usage
 
 `git-semver` collects information about the head commit of a repo similar to how
 `git describe` would do it and derives a SemVer compliant version from it. E.g.:

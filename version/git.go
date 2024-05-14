@@ -26,15 +26,15 @@ type options struct {
 
 type Option = func(*options)
 
-func WithMatchPattern(p string) Option {
+func WithMatchPattern(pattern string) Option {
 	return func(opts *options) {
 		opts.matchFunc = func(tagName string) bool {
-			if p == "" {
+			if pattern == "" {
 				return true
 			}
-			matched, err := filepath.Match(p, tagName)
+			matched, err := filepath.Match(pattern, tagName)
 			if err != nil {
-				fmt.Printf("Ignoring invalid match pattern: %s: %s\n", p, err)
+				fmt.Printf("Ignoring invalid match pattern: %s: %s\n", pattern, err)
 				return true
 			}
 			return matched
@@ -42,7 +42,7 @@ func WithMatchPattern(p string) Option {
 	}
 }
 
-// GitDescribe looks at the git respository at path and figures
+// GitDescribe looks at the git repository at path and figures
 // out versioning relvant information about the head commit.
 func GitDescribe(path string, opts ...Option) (*RepoHead, error) {
 	options := options{matchFunc: func(string) bool { return true }}
@@ -87,7 +87,7 @@ func GitDescribe(path string, opts ...Option) (*RepoHead, error) {
 			ref.LastTag = tag.Name
 			return storer.ErrStop
 		}
-		ref.CommitsSinceTag += 1
+		ref.CommitsSinceTag++
 		return nil
 	})
 	return &ref, nil
@@ -104,8 +104,8 @@ func getTagMap(repo *git.Repository, match func(string) bool) (map[string]Tag, e
 		return nil, err
 	}
 	result := make(map[string]Tag)
-	if err = tags.ForEach(func(r *plumbing.Reference) error {
-		tag, err := repo.TagObject(r.Hash())
+	if err = tags.ForEach(func(ref *plumbing.Reference) error {
+		tag, err := repo.TagObject(ref.Hash())
 		switch err {
 		case nil:
 			commit, err := tag.Commit()
@@ -120,7 +120,7 @@ func getTagMap(repo *git.Repository, match func(string) bool) (map[string]Tag, e
 				result[hash] = Tag{Name: tag.Name, When: tag.Tagger.When}
 			}
 		case plumbing.ErrObjectNotFound:
-			commit, err := repo.CommitObject(r.Hash())
+			commit, err := repo.CommitObject(ref.Hash())
 			if err != nil {
 				return nil
 			}
@@ -128,7 +128,7 @@ func getTagMap(repo *git.Repository, match func(string) bool) (map[string]Tag, e
 			if c, ok := result[hash]; ok && !commit.Committer.When.After(c.When) {
 				return nil
 			}
-			tagName := r.Name().Short()
+			tagName := ref.Name().Short()
 			if match(tagName) {
 				result[hash] = Tag{Name: tagName, When: commit.Committer.When}
 			}

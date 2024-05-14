@@ -8,20 +8,22 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGitDescribe(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 	dir, _ := os.MkdirTemp("", "example")
 	repo, err := git.PlainInit(dir, false)
-	assert.NoError(err)
+	require.NoError(err)
 
 	worktree, err := repo.Worktree()
-	assert.NoError(err)
+	require.NoError(err)
 
 	test := func(expected *RepoHead, opts ...Option) {
 		actual, err := GitDescribe(dir, opts...)
-		assert.NoError(err)
+		require.NoError(err)
 		assert.Equal(expected, actual)
 	}
 
@@ -38,11 +40,11 @@ func TestGitDescribe(t *testing.T) {
 	}
 
 	commit1, err := worktree.Commit("first commit", &opts)
-	assert.NoError(err)
+	require.NoError(err)
 	test(&RepoHead{Hash: commit1.String(), CommitsSinceTag: 1})
 
 	tag1, err := repo.CreateTag("1.0.0", commit1, nil)
-	assert.NoError(err)
+	require.NoError(err)
 	test(&RepoHead{
 		LastTag:         tag1.Name().Short(),
 		Hash:            commit1.String(),
@@ -54,7 +56,7 @@ func TestGitDescribe(t *testing.T) {
 		Tagger:  author,
 		Message: "annotated tag",
 	})
-	assert.NoError(err)
+	require.NoError(err)
 	test(&RepoHead{
 		LastTag:         tag1Post.Name().Short(),
 		Hash:            commit1.String(),
@@ -69,7 +71,7 @@ func TestGitDescribe(t *testing.T) {
 
 	author.When = author.When.Add(1 * time.Hour)
 	commit2, err := worktree.Commit("second commit", &opts)
-	assert.NoError(err)
+	require.NoError(err)
 	test(&RepoHead{
 		LastTag:         tag1Post.Name().Short(),
 		Hash:            commit2.String(),
@@ -81,7 +83,7 @@ func TestGitDescribe(t *testing.T) {
 		Tagger:  author,
 		Message: "looks like the final release",
 	})
-	assert.NoError(err)
+	require.NoError(err)
 	test(&RepoHead{
 		LastTag:         tag2.Name().Short(),
 		Hash:            commit2.String(),
@@ -93,7 +95,7 @@ func TestGitDescribe(t *testing.T) {
 		Tagger:  author,
 		Message: "the final release",
 	})
-	assert.NoError(err)
+	require.NoError(err)
 	test(&RepoHead{
 		LastTag:         tag3.Name().Short(),
 		Hash:            commit2.String(),
@@ -102,7 +104,7 @@ func TestGitDescribe(t *testing.T) {
 
 	dir += "/subfoler"
 	err = os.Mkdir(dir, 0750)
-	assert.NoError(err)
+	require.NoError(err)
 
 	test(&RepoHead{
 		LastTag:         tag3.Name().Short(),
@@ -112,17 +114,16 @@ func TestGitDescribe(t *testing.T) {
 }
 
 func TestGitDescribeError(t *testing.T) {
-	assert := assert.New(t)
 	dir, _ := os.MkdirTemp("", "example")
 
 	test := func(msg string) {
 		head, err := GitDescribe(dir)
-		assert.Nil(head)
-		assert.EqualError(err, msg)
+		assert.Nil(t, head)
+		require.EqualError(t, err, msg)
 	}
 	test("failed to open repo: repository does not exist")
 
 	_, err := git.PlainInit(dir, false)
-	assert.NoError(err)
+	require.NoError(t, err)
 	test("failed to retrieve repo head: reference not found")
 }

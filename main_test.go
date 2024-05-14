@@ -9,6 +9,7 @@ import (
 
 	"github.com/mdomke/git-semver/v6/version"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseFlags(t *testing.T) {
@@ -70,13 +71,13 @@ func TestParseFlags(t *testing.T) {
 		t.Run(strings.Join(test.args, " "), func(t *testing.T) {
 			cfg, out, err := parseFlags("git-semver", test.args)
 			if test.hasError {
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Nil(t, cfg)
 				assert.NotEmpty(t, out)
 			} else {
 				test.cfg.stdout = os.Stdout
 				test.cfg.stderr = os.Stderr
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, test.cfg, cfg)
 				assert.Empty(t, out)
 			}

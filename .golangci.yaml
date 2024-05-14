@@ -1,0 +1,9 @@
+linters:
+  enable:
+    - gocritic
+    - misspell
+    - gofmt
+    - revive
+    - varnamelen
+    - godot
+    - testifylint
