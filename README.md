@@ -23,7 +23,7 @@
    $ git tag $(git-semver -target minor)
    ```
   or create an alias
-   ```console
+   ```bash
    alias tag-minor="git-semver -target minor"  
    ```
 
