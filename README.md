@@ -1,9 +1,9 @@
 <p align="center">
-   <a href="https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test"><img src="https://img.shields.io/github/actions/workflow/status/mdomke/git-semver/lint-and-test.yaml?branch=master?style=flat-square" /></a>
-   <a href="https://codecov.io/gh/mdomke/git-semver"><img src="https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg?style=flat-square" /></a>
+   <a href="https://github.com/mdomke/git-semver/actions?query=workflow%3Alint-and-test"><img src="https://img.shields.io/github/actions/workflow/status/mdomke/git-semver/lint-and-test.yaml?branch=master" /></a>
+   <a href="https://codecov.io/gh/mdomke/git-semver"><img src="https://codecov.io/gh/mdomke/git-semver/branch/master/graph/badge.svg" /></a>
    <a href="LICENSE"><img src="https://img.shields.io/github/license/mdomke/git-semver.svg?style=flat-square" /></a>
-   <img src="https://img.shields.io/github/tag/mdomke/git-semver.svg?style=flat-square" />
-   <a href="https://goreportcard.com/report/github.com/mdomke/git-semver"><img src="https://goreportcard.com/badge/github.com/mdomke/git-semver?style=flat-square" /></a>
+   <img src="https://img.shields.io/github/tag/mdomke/git-semver.svg" />
+   <a href="https://goreportcard.com/report/github.com/mdomke/git-semver"><img src="https://goreportcard.com/badge/github.com/mdomke/git-semver" /></a>
 </p>
 
 # `git-semver`: Semantic Versioning with git tags 
