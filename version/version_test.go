@@ -210,3 +210,10 @@ func TestParseRelease(t *testing.T) {
 	require.NoError(t, target.Set("major"))
 	assert.Equal(t, Major, target)
 }
+
+func TestVersionCompare(t *testing.T) {
+	v := Version{Major: 1, Minor: 2, Patch: 3}
+	assert.Equal(t, v.Compare(&Version{Major: 1, Minor: 3, Patch: 0}), -1)
+	assert.Equal(t, v.Compare(&Version{Major: 1, Minor: 0, Patch: 0}), 2)
+	assert.Equal(t, v.Compare(&Version{Major: 1, Minor: 2, Patch: 3}), 0)
+}

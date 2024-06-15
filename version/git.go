@@ -124,14 +124,25 @@ func getTagMap(repo *git.Repository, match func(string) bool) (map[string]Tag, e
 			if err != nil {
 				return nil
 			}
-			hash := commit.Hash.String()
-			if c, ok := result[hash]; ok && !commit.Committer.When.After(c.When) {
+			tagName := ref.Name().Short()
+			if !match(tagName) {
 				return nil
 			}
-			tagName := ref.Name().Short()
-			if match(tagName) {
+			hash := commit.Hash.String()
+			c, ok := result[hash]
+			if !ok {
+				result[hash] = Tag{Name: tagName, When: commit.Committer.When}
+				return nil
+			}
+			// two tags on the same commit, select the larger one.
+			h0 := RepoHead{c.Name, 0, hash}
+			h1 := RepoHead{tagName, 0, hash}
+			v0, err0 := NewFromHead(&h0, "")
+			v1, err1 := NewFromHead(&h1, "")
+			if err0 != nil || (err1 == nil && v1.Compare(&v0) > 0) {
 				result[hash] = Tag{Name: tagName, When: commit.Committer.When}
 			}
+			return nil
 		default:
 			return err
 		}
