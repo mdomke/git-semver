@@ -101,7 +101,17 @@ func (v Version) Compare(o *Version) int {
 	if v.Minor != o.Minor {
 		return v.Minor - o.Minor
 	}
-	return v.Patch - o.Patch
+	if v.Patch != o.Patch {
+		return v.Patch - o.Patch
+	}
+	if v.Commits != o.Commits {
+		return v.Commits - o.Commits
+	}
+	if v.Meta != o.Meta {
+		return strings.Compare(v.Meta, o.Meta)
+	}
+	// alphabetic order
+	return strings.Compare(v.String(), o.String())
 }
 
 // BumpTo increases the version to the next patch/minor/major version. The version components with
