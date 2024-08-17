@@ -24,7 +24,7 @@
    ```
   or create an alias
    ```bash
-   alias gtg-min="git tag -s -a $(git-semver -target minor)"  
+   alias gtg-min='git tag -s -a $(git-semver -target minor)'
    ```
 
 ## Why is this useful?
