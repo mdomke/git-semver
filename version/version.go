@@ -89,6 +89,31 @@ type Version struct {
 	Meta       string
 }
 
+// Return 0 if both versions are equal
+// Compares two versions. It returns
+//   - 0 if both versions are equal
+//   - some positive number if v > o
+//   - some negative number if v < o
+func (v Version) Compare(o *Version) int {
+	if v.Major != o.Major {
+		return v.Major - o.Major
+	}
+	if v.Minor != o.Minor {
+		return v.Minor - o.Minor
+	}
+	if v.Patch != o.Patch {
+		return v.Patch - o.Patch
+	}
+	if v.Commits != o.Commits {
+		return v.Commits - o.Commits
+	}
+	if v.Meta != o.Meta {
+		return strings.Compare(v.Meta, o.Meta)
+	}
+	// alphabetic order
+	return strings.Compare(v.String(), o.String())
+}
+
 // BumpTo increases the version to the next patch/minor/major version. The version components with
 // lower priority than the update target will be reset to zero.
 //
