@@ -42,19 +42,14 @@ func WithMatchPattern(pattern string) Option {
 	}
 }
 
-// GitDescribe looks at the git repository at path and figures
-// out versioning relvant information about the head commit.
-func GitDescribe(path string, opts ...Option) (*RepoHead, error) {
+// GitDescribeRepository takes an existing loaded Git repository instead
+// of a local path (for use cases of using in-memory repositories).
+func GitDescribeRepository(repo *git.Repository, opts ...Option) (*RepoHead, error) {
 	options := options{matchFunc: func(string) bool { return true }}
 	for _, apply := range opts {
 		apply(&options)
 	}
 
-	openOpts := git.PlainOpenOptions{DetectDotGit: true}
-	repo, err := git.PlainOpenWithOptions(path, &openOpts)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open repo: %w", err)
-	}
 	head, err := repo.Head()
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve repo head: %w", err)
@@ -91,6 +86,18 @@ func GitDescribe(path string, opts ...Option) (*RepoHead, error) {
 		return nil
 	})
 	return &ref, nil
+}
+
+// GitDescribe looks at the git repository at path and figures
+// out versioning relvant information about the head commit.
+func GitDescribe(path string, opts ...Option) (*RepoHead, error) {
+	openOpts := git.PlainOpenOptions{DetectDotGit: true}
+	repo, err := git.PlainOpenWithOptions(path, &openOpts)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open repo: %w", err)
+	}
+
+	return GitDescribeRepository(repo, opts...)
 }
 
 type Tag struct {
