@@ -172,7 +172,7 @@ func TestInvalidFormat(t *testing.T) {
 	v := Version{Major: 1, Minor: 2, Patch: 3}
 	s, err := v.Format("q")
 	require.EqualError(t, err, "invalid format: q")
-	assert.Equal(t, "", s)
+	assert.Empty(t, s)
 }
 
 func TestReleaseToString(t *testing.T) {
