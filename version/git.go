@@ -9,6 +9,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/storer"
+	"golang.org/x/mod/semver"
 )
 
 // RepoHead provides statistics about the head commit of a git
@@ -45,7 +46,9 @@ func WithMatchPattern(pattern string) Option {
 // GitDescribe looks at the git repository at path and figures
 // out versioning relvant information about the head commit.
 func GitDescribe(path string, opts ...Option) (*RepoHead, error) {
-	options := options{matchFunc: func(string) bool { return true }}
+	options := options{matchFunc: func(version string) bool {
+		return semver.IsValid(ensurePrefix(version))
+	}}
 	for _, apply := range opts {
 		apply(&options)
 	}
@@ -120,26 +123,22 @@ func getTagMap(repo *git.Repository, match func(string) bool) (map[string]Tag, e
 				result[hash] = Tag{Name: tag.Name, When: tag.Tagger.When}
 			}
 		case plumbing.ErrObjectNotFound:
-			commit, err := repo.CommitObject(ref.Hash())
-			if err != nil {
-				return nil
-			}
 			tagName := ref.Name().Short()
 			if !match(tagName) {
 				return nil
 			}
+			commit, err := repo.CommitObject(ref.Hash())
+			if err != nil {
+				return nil
+			}
 			hash := commit.Hash.String()
-			c, ok := result[hash]
+			existing, ok := result[hash]
 			if !ok {
 				result[hash] = Tag{Name: tagName, When: commit.Committer.When}
 				return nil
 			}
-			// two tags on the same commit, select the larger one.
-			h0 := RepoHead{c.Name, 0, hash}
-			h1 := RepoHead{tagName, 0, hash}
-			v0, err0 := NewFromHead(&h0, "")
-			v1, err1 := NewFromHead(&h1, "")
-			if err0 != nil || (err1 == nil && v1.Compare(&v0) > 0) {
+
+			if semver.Compare(ensurePrefix(existing.Name), ensurePrefix(tagName)) < 0 {
 				result[hash] = Tag{Name: tagName, When: commit.Committer.When}
 			}
 			return nil

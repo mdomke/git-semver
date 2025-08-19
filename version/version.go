@@ -11,6 +11,13 @@ import (
 // DefaultPrefix that is recognized and ignored by the parser.
 const DefaultPrefix = "v"
 
+func ensurePrefix(version string) string {
+	if strings.HasPrefix(version, DefaultPrefix) {
+		return version
+	}
+	return DefaultPrefix + version
+}
+
 // Predefined format strings to be used with the Format function.
 const (
 	FullFormat    = "x.y.z-p+m"
@@ -87,31 +94,6 @@ type Version struct {
 	preRelease string
 	Commits    int
 	Meta       string
-}
-
-// Return 0 if both versions are equal
-// Compares two versions. It returns
-//   - 0 if both versions are equal
-//   - some positive number if v > o
-//   - some negative number if v < o
-func (v Version) Compare(o *Version) int {
-	if v.Major != o.Major {
-		return v.Major - o.Major
-	}
-	if v.Minor != o.Minor {
-		return v.Minor - o.Minor
-	}
-	if v.Patch != o.Patch {
-		return v.Patch - o.Patch
-	}
-	if v.Commits != o.Commits {
-		return v.Commits - o.Commits
-	}
-	if v.Meta != o.Meta {
-		return strings.Compare(v.Meta, o.Meta)
-	}
-	// alphabetic order
-	return strings.Compare(v.String(), o.String())
 }
 
 // BumpTo increases the version to the next patch/minor/major version. The version components with
